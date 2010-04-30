@@ -39,7 +39,7 @@ namespace Blokus.Logic.AlphaBeta
         {
             if (depth == 0) //osiagnieto maksymalny poziom rekurencji
             {
-                return _Heursitics.GetBoardEvaluation(gameState); //TODO: heurystyczna ocena sytuacji na planszy...
+                return _Heursitics.GetBoardEvaluation(gameState);
             }
             _Heursitics.SortHand(gameState); //posortuj klocki gracza by najlepsze byly na poczatku
             var moves = GameRules.GetMoves(gameState, MaxTreeRank); //pobierz MaxTreeRank pierwszych dostepnych ruchow
