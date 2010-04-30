@@ -117,7 +117,7 @@ namespace Blokus.UI
 
         void square_Click(object sender, BoardClickEventArgs e)
         {
-            if (Click != null)
+            if (Click != null && Hand!=null)
             {
                 int variantX = e.PiecePosition.X / PieceSizeX;
                 int variantY = e.PiecePosition.Y / PieceSizeY;

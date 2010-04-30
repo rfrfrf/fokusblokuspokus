@@ -209,8 +209,22 @@ namespace Blokus.Logic
 
         public static double GetGameResult(GameState gameState)
         {
-            int orangeScore = 0;
-            int violetScore = 0;
+            int orangeScore;
+            int violetScore;
+            GetScores(gameState, out orangeScore, out violetScore);
+
+            if (violetScore == orangeScore)
+            {
+                return 0;
+            }
+            return (violetScore > orangeScore ^ gameState.CurrentPlayerColor == Player.Violet) ? 1 : -1;
+
+        }
+
+        private static void GetScores(GameState gameState, out int orangeScore, out int violetScore)
+        {
+            orangeScore = 0;
+            violetScore = 0;
 
             orangeScore -= (from o in gameState.OrangeHand.HandPieces select o.Variants[0].Squares.Length).Sum();
             violetScore -= (from o in gameState.VioletHand.HandPieces select o.Variants[0].Squares.Length).Sum();
@@ -232,13 +246,23 @@ namespace Blokus.Logic
                     violetScore += MonominoLastBonus;
                 }
             }
+        }
 
-            if (violetScore == orangeScore)
+        public static Player GetWinner(GameState gameState)
+        {
+            int orangeScore;
+            int violetScore;
+            GetScores(gameState, out orangeScore, out violetScore);
+
+            if (orangeScore == violetScore)
             {
-                return 0;
+                return Player.None;
             }
-            return (violetScore > orangeScore ^ gameState.CurrentPlayerColor == Player.Violet) ? 1 : -1;
-
+            if (orangeScore > violetScore)
+            {
+                return Player.Orange;
+            }
+            return Player.Violet;
         }
     }
 

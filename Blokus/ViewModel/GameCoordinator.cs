@@ -27,6 +27,22 @@ namespace Blokus.ViewModel
             get { return CurrentPiece.Variants[_CurrentVariantNumber % CurrentPiece.Variants.Length]; }
         }
 
+        private bool _IsOrangeWinner;
+
+        public bool IsOrangeWinner
+        {
+            get { return _IsOrangeWinner; }
+            set { _IsOrangeWinner = value; NotifyPropertyChanged("IsOrangeWinner"); }
+        }
+
+        private bool _IsVioletWinner;
+
+        public bool IsVioletWinner
+        {
+            get { return _IsVioletWinner; }
+            set { _IsVioletWinner = value; NotifyPropertyChanged("IsVioletWinner"); }
+        }
+
         public Piece CurrentPiece
         {
             get { return _CurrentPiece; }
@@ -151,6 +167,8 @@ namespace Blokus.ViewModel
         {
             if (_Worker == null || !_Worker.IsBusy)
             {
+                IsVioletWinner = false; 
+                IsOrangeWinner = false;
                 GameState = new GameState();
                 RefreshUI();
                 OrangePlayer.OnGameStart();
@@ -184,6 +202,17 @@ namespace Blokus.ViewModel
             return false;
         }
 
+        private void ShowGameResult()
+        {
+            var result = GameRules.GetWinner(GameState);
+            switch (result)
+            {
+                case Player.Violet: IsVioletWinner = true; IsOrangeWinner = false; break;
+                case Player.Orange: IsVioletWinner = false; IsOrangeWinner = true; break;
+                case Player.None: IsVioletWinner = true; IsOrangeWinner = true; break;
+            }
+        }
+
         private void RefreshUI()
         {
             GameState = GameState; //odswierzenie planszy
@@ -194,6 +223,7 @@ namespace Blokus.ViewModel
             NotifyPropertyChanged("Board");
             NotifyPropertyChanged("OrangeHand");
             NotifyPropertyChanged("VioletHand");
+            NotifyPropertyChanged("CurrentPlayerColor");
         }
 
         private void StartGameWorker()
@@ -211,6 +241,7 @@ namespace Blokus.ViewModel
             NotifyPropertyChanged("IsGameInProgress");
             OrangePlayer.OnGameEnd();
             VioletPlayer.OnGameEnd();
+            ShowGameResult();
         }
 
         private void GameWorker(object sender, DoWorkEventArgs e)

@@ -9,8 +9,9 @@
     xmlns:logicMonte="clr-namespace:Blokus.Logic.MonteCarloTreeSearch"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     Title="Blokus Duo" 
-    Height="447" 
-    Width="610" MouseWheel="Window_MouseWheel">
+    Height="462" 
+    Width="610" 
+        MouseWheel="Window_MouseWheel">
     
     <Window.Resources>
         <x:Array Type="{x:Type logic:PlayerBase}" x:Key="playersDataSource">
@@ -71,12 +72,44 @@
             ItemsSource="{Binding Source={StaticResource playersDataSource}}" 
             SelectedValue="{Binding VioletPlayer}"
             />
-        <usr:HandControl 
-            Grid.Row="2"
-            Hand="{Binding Path=OrangeHand}"
-            HandOwner="{x:Static logic:Player.Orange}"
-            Click="Hand_Click"
-            />        
+        <Border
+            Grid.Row="2" 
+            BorderBrush="Green"
+            >
+            <Border                 
+                BorderBrush="Red"
+                >
+                <usr:HandControl             
+                    Hand="{Binding Path=OrangeHand}"
+                    HandOwner="{x:Static logic:Player.Orange}"
+                    Click="Hand_Click"                
+                    />  
+                <Border.Style>
+                    <Style>
+                        <Setter Property="Border.BorderThickness" Value="0"/>
+                        <Style.Triggers>
+                            <DataTrigger 
+                                Binding="{Binding Path=CurrentPlayerColor}" 
+                                Value="{x:Static logic:Player.Orange}">
+                                <Setter Property="Border.BorderThickness" Value="3"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+            </Border>
+            <Border.Style>
+                <Style>
+                    <Setter Property="Border.BorderThickness" Value="0"/>
+                    <Style.Triggers>
+                        <DataTrigger 
+                                Binding="{Binding Path=IsOrangeWinner}" 
+                                Value="true">
+                            <Setter Property="Border.BorderThickness" Value="3"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+        </Border>    
         <Grid  
             x:Name="BoardGrid"
             Grid.Column="1"
@@ -96,12 +129,44 @@
                     PieceColor="{Binding Path=CurrentPlayerColor, Converter={conv:PlayerToBrushConverter}}"  />
             </Canvas>
         </Grid>
-        <usr:HandControl 
-            Grid.Column="2"
-            Grid.Row="2"
-            Hand="{Binding Path=VioletHand}"
-            HandOwner="{x:Static logic:Player.Violet}"
-            Click="Hand_Click"
-            />
+        <Border
+            Grid.Row="2" 
+            Grid.Column="2" 
+            BorderBrush="Green"
+            >
+            <Border 
+                BorderBrush="Red"
+                >
+                <usr:HandControl 
+                    Hand="{Binding Path=VioletHand}"
+                    HandOwner="{x:Static logic:Player.Violet}"
+                    Click="Hand_Click"
+                    />
+                <Border.Style>
+                    <Style>
+                        <Setter Property="Border.BorderThickness" Value="0"/>
+                        <Style.Triggers>
+                            <DataTrigger 
+                                Binding="{Binding Path=CurrentPlayerColor}" 
+                                Value="{x:Static logic:Player.Violet}">
+                                <Setter Property="Border.BorderThickness" Value="3"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+            </Border>
+            <Border.Style>
+                <Style>
+                    <Setter Property="Border.BorderThickness" Value="0"/>
+                    <Style.Triggers>
+                        <DataTrigger 
+                                Binding="{Binding Path=IsVioletWinner}" 
+                                Value="true">
+                            <Setter Property="Border.BorderThickness" Value="3"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+        </Border>
     </Grid>
 </Window>
