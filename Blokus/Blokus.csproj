@@ -98,6 +98,8 @@
     <Compile Include="Logic\AlphaBeta\AlphaBetaPlayer.cs" />
     <Compile Include="Logic\Board.cs" />
     <Compile Include="Logic\MonteCarloTreeSearch\MonteCarloTreeSearchPlayer.cs" />
+    <Compile Include="Logic\MonteCarloTreeSearch\MultipleTree.cs" />
+    <Compile Include="Logic\MonteCarloTreeSearch\MultipleTreeNode.cs" />
     <Compile Include="Logic\PiecePosition.cs" />
     <Compile Include="Logic\Pieces.cs" />
     <Compile Include="Logic\PieceVariant.cs" />
