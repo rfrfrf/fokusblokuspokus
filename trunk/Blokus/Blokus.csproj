@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{B4988AE9-5924-4330-BBD3-47FA82C57F6D}</ProjectGuid>
     <OutputType>WinExe</OutputType>
@@ -97,6 +97,7 @@
     <Compile Include="Logic\AlphaBeta\AlphaBetaHeuristics.cs" />
     <Compile Include="Logic\AlphaBeta\AlphaBetaPlayer.cs" />
     <Compile Include="Logic\Board.cs" />
+    <Compile Include="Logic\Heuristics.cs" />
     <Compile Include="Logic\MonteCarloTreeSearch\MonteCarloTreeSearchPlayer.cs" />
     <Compile Include="Logic\MonteCarloTreeSearch\MultipleTree.cs" />
     <Compile Include="Logic\MonteCarloTreeSearch\MultipleTreeNode.cs" />

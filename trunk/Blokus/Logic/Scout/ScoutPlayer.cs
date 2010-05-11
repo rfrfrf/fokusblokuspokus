@@ -8,9 +8,9 @@ namespace Blokus.Logic.Scout
 {
     class ScoutPlayer : AIPlayer
     {
-        private const int MaxDepth = 8;
-        private const int MaxTreeRank = 7;
-        private AlphaBetaHeuristics _Heursitics = new AlphaBetaHeuristics();
+        private const int MaxDepth = 6;
+        private const int MaxTreeRank = 15;
+        private Heuristics _Heursitics = new ScoutHeuristics();
         private Move _LastMove;
 
         public override Move GetMove(GameState gameState)

@@ -207,27 +207,89 @@ namespace Blokus.Logic
                 y < Board.BoardSize && board[x, y] == kind;
         }
 
+        /// <summary>
+        /// Wywoływane gdy aktualny gracz nie ma żadnych możliwych ruchów.
+        /// </summary>
+        /// <param name="gameState">Bieżący Stan gry</param>
+        /// <returns>-1 gdy aktualny gracz przegrał, +1 gdy wygrał, 0 gdy remis</returns>
         public static double GetGameResult(GameState gameState)
         {
-            int orangeScore;
-            int violetScore;
-            GetScores(gameState, out orangeScore, out violetScore);
+            Player blocked = gameState.CurrentPlayerColor;
+            Player opponent = blocked == Player.Orange ? Player.Violet : Player.Orange;
 
-            if (violetScore == orangeScore)
+            int blockedScore = GetPlayerScore(gameState, blocked);
+            int opponentScore = GetPlayerScore(gameState, opponent);
+            int result = -1; //domyślnie gracz zablokowany przegrywa
+
+            if (blockedScore >= opponentScore)
+            //stawiaj klocki na planszy niezablokowanym graczem dopóki nie ma większego wyniku. 
+            //zablokowany gracz wygrywa tylko gdy dla kazdego polozenia klockow gracza niezablokowanego gracz zablokowany ma wiekszy wynik
             {
-                return 0;
-            }
-            return (violetScore > orangeScore ^ gameState.CurrentPlayerColor == Player.Violet) ? 1 : -1;
+                gameState.SwapCurrentPlayer();
+                result = PlacePieces(gameState, opponent, blockedScore);
+                gameState.SwapCurrentPlayer();
+            }            
+
+            return result;
 
         }
 
-        private static void GetScores(GameState gameState, out int orangeScore, out int violetScore)
+        /// <summary>
+        /// Układa na planszy klocki niezablokowanego gracza dopóki ma on mniejszy wynik od zablokowanego gracza
+        /// </summary>
+        /// <returns>-1 jeśli niezablokowany gracz wygrał, 1 jeśli przegrał, 0 jeśli zremisował 
+        /// czyli wynik gry z punktu widzenia zablokowanego gracza</returns>
+        private static int PlacePieces(GameState gameState, Player opponent, int blockedScore)
         {
-            orangeScore = 0;
-            violetScore = 0;
+            var moves = GetMoves(gameState);
+            int opponentScore = GetPlayerScore(gameState, opponent);
+            int result = opponentScore==blockedScore? 0:1;
+            foreach (var move in moves)
+            {
+                gameState.AddMove(move);
+                opponentScore = GetPlayerScore(gameState, opponent);
+                if (opponentScore > blockedScore)
+                {
+                    result = -1;
+                }
+                else
+                {
+                    if (opponentScore == blockedScore)
+                    {
+                        result = 0;
+                    }
+                    else
+                    {
+                        result = Math.Min(result, PlacePieces(gameState, opponent, blockedScore));
+                    }
+                }
+                gameState.DelMove(move);
+                if (result == -1)
+                {
+                    break;
+                }
+            }
+            return result;
+        }
+
+        private static int GetPlayerScore(GameState gameState, Player player)
+        {
+            if (player == Player.Violet)
+            {
+                return GetVioletScore(gameState);
+            }
+            if (player == Player.Orange)
+            {
+                return GetOrangeScore(gameState);
+            }
+            return 0;
+        }
+
+        private static int GetOrangeScore(GameState gameState)
+        {
+            int orangeScore = 0;
 
             orangeScore -= (from o in gameState.OrangeHand.HandPieces select o.Variants[0].Squares.Length).Sum();
-            violetScore -= (from o in gameState.VioletHand.HandPieces select o.Variants[0].Squares.Length).Sum();
 
             if (orangeScore == 0) //wszyskie klocki położył
             {
@@ -237,7 +299,14 @@ namespace Blokus.Logic
                     orangeScore += MonominoLastBonus;
                 }
             }
+            return orangeScore;
+        }
 
+        private static int GetVioletScore(GameState gameState)
+        {
+            int violetScore = 0;
+
+            violetScore -= (from o in gameState.VioletHand.HandPieces select o.Variants[0].Squares.Length).Sum();
             if (violetScore == 0) //wszyskie klocki położył
             {
                 violetScore += EmptyHandBonus;
@@ -246,13 +315,13 @@ namespace Blokus.Logic
                     violetScore += MonominoLastBonus;
                 }
             }
+            return violetScore;
         }
 
         public static Player GetWinner(GameState gameState)
         {
-            int orangeScore;
-            int violetScore;
-            GetScores(gameState, out orangeScore, out violetScore);
+            int orangeScore = GetOrangeScore(gameState);
+            int violetScore = GetVioletScore(gameState);            
 
             if (orangeScore == violetScore)
             {
