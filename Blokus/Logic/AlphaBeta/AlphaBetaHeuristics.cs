@@ -5,13 +5,18 @@ using System.Text;
 
 namespace Blokus.Logic.AlphaBeta
 {
-    class AlphaBetaHeuristics
+    class AlphaBetaHeuristics : Heuristics
     {
-        /// <summary>
+        public override double GetBoardEvaluation(GameState gameState)
+        {
+            return GameRules.GetMoves(gameState).Count*0.001;
+        }
+
+  /*      /// <summary>
         /// dla pomaranczowego gracza promuje ruchy w kierunku lewego gornego rogu planszy
         /// dla fioletowego gracza promuje ruchy w kierunku prawego dolnego rogu planszy
         /// </summary>
-        public double GetBoardEvaluation(GameState gameState)
+        public override double GetBoardEvaluation(GameState gameState)
         {
             var elements = gameState.Board.BoardElements;
             double result = 0.0;
@@ -43,13 +48,13 @@ namespace Blokus.Logic.AlphaBeta
                 }
             }
             return result;
-        }
+        }*/
 
         /// <summary>
         /// na poczatku listy klockow ustawia klocki o najwiekszej liczbie rogow lub najwiekszej liczbie elementow
         /// </summary>
         /// <param name="gameState"></param>
-        public void SortHand(GameState gameState)
+        public override void SortHand(GameState gameState)
         {           
             gameState.CurrentPlayerHand.HandPieces.Sort((x, y) =>
             {
@@ -69,7 +74,7 @@ namespace Blokus.Logic.AlphaBeta
         /// </summary>
         /// <param name="gameState"></param>
         /// <param name="moves"></param>
-        public void SortMoves(GameState gameState, List<Move> moves)
+        public override void SortMoves(GameState gameState, List<Move> moves)
         {
             int multiplier = gameState.CurrentPlayerColor == Player.Violet ? 1 : -1;
             moves.Sort((x, y) =>
@@ -83,5 +88,27 @@ namespace Blokus.Logic.AlphaBeta
                 return y.PieceVariant.Squares.Length.CompareTo(x.PieceVariant.Squares.Length) * multiplier;
             });
         }
+        /*
+        /// <summary>
+        /// Ustawia na początku te ruchy, które skutkują najmniejszą ilością ruchów przeciwnika
+        /// </summary>
+        /// <param name="gameState"></param>
+        /// <param name="moves"></param>
+        public override void SortMoves(GameState gameState, List<Move> moves)
+        {
+            Dictionary<Move, int> oponentMovesCount = new Dictionary<Move, int>();
+            for (int i = 0; i < moves.Count; i++)
+            {
+                gameState.AddMove(moves[i]);
+                gameState.SwapCurrentPlayer();
+                oponentMovesCount[moves[i]] = GameRules.GetMoves(gameState).Count;
+                gameState.SwapCurrentPlayer();
+                gameState.DelMove(moves[i]);
+            }
+            moves.Sort((x, y) =>
+            {
+                return oponentMovesCount[x].CompareTo(oponentMovesCount[y]);
+            });
+        }*/
     }
 }

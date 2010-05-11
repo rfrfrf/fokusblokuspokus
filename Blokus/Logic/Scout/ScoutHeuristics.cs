@@ -5,13 +5,13 @@ using System.Text;
 
 namespace Blokus.Logic.Scout
 {
-    class ScoutHeuristics
+    class ScoutHeuristics : Heuristics
     {
         /// <summary>
         /// dla pomaranczowego gracza promuje ruchy w kierunku lewego gornego rogu planszy
         /// dla fioletowego gracza promuje ruchy w kierunku prawego dolnego rogu planszy
         /// </summary>
-        public double GetBoardEvaluation(GameState gameState)
+        public override double GetBoardEvaluation(GameState gameState)
         {
             var elements = gameState.Board.BoardElements;
             double result = 0.0;
@@ -49,7 +49,7 @@ namespace Blokus.Logic.Scout
         /// na poczatku listy klockow ustawia klocki o najwiekszej liczbie rogow lub najwiekszej liczbie elementow
         /// </summary>
         /// <param name="gameState"></param>
-        public void SortHand(GameState gameState)
+        public override void SortHand(GameState gameState)
         {           
             gameState.CurrentPlayerHand.HandPieces.Sort((x, y) =>
             {
@@ -69,7 +69,7 @@ namespace Blokus.Logic.Scout
         /// </summary>
         /// <param name="gameState"></param>
         /// <param name="moves"></param>
-        public void SortMoves(GameState gameState, List<Move> moves)
+        public override void SortMoves(GameState gameState, List<Move> moves)
         {
             int multiplier = gameState.CurrentPlayerColor == Player.Violet ? 1 : -1;
             moves.Sort((x, y) =>

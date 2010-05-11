@@ -23,8 +23,8 @@ namespace Blokus.Logic.AlphaBeta
             alphabeta(origin, depth, -infinity, +infinity)
          */
 
-        private const int MaxDepth = 6;
-        private const int MaxTreeRank = 7;
+        private const int MaxDepth = 2;
+        private const int MaxTreeRank = 666;
         private Move _LastMove;
         private AlphaBetaHeuristics _Heursitics = new AlphaBetaHeuristics();
 
