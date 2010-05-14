@@ -77,6 +77,20 @@ namespace Blokus.UI
                     square.Click += new EventHandler<BoardClickEventArgs>(square_Click);
                 }
             }
+
+            var orangeStart = new Ellipse();
+            orangeStart.Margin = new Thickness(2);
+            orangeStart.Fill = Brushes.Orange;
+            Grid.SetColumn(orangeStart, GameRules.OrangeStartPositionX);
+            Grid.SetRow(orangeStart, GameRules.OrangeStartPositionY);
+            MainGrid.Children.Add(orangeStart);
+
+            var violetStart = new Ellipse();
+            violetStart.Margin = new Thickness(2);
+            violetStart.Fill = Brushes.Violet;
+            Grid.SetColumn(violetStart, GameRules.VioletStartPositionX);
+            Grid.SetRow(violetStart, GameRules.VioletStartPositionY);
+            MainGrid.Children.Add(violetStart);
         }
 
         void square_Click(object sender, BoardClickEventArgs e)
