@@ -9,12 +9,17 @@
     xmlns:logicMonte="clr-namespace:Blokus.Logic.MonteCarloTreeSearch"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     Title="Blokus Duo" 
-    Height="462" 
-    Width="610" 
-        MouseWheel="Window_MouseWheel">
+
+        MouseWheel="Window_MouseWheel" Height="516" Width="657">
     
     <Window.Resources>
-        <x:Array Type="{x:Type logic:PlayerBase}" x:Key="playersDataSource">
+        <x:Array Type="{x:Type logic:PlayerBase}" x:Key="orangePlayersDataSource">
+            <logic:HumanPlayer />
+            <logicAlphaBeta:AlphaBetaPlayer />
+            <logicScout:ScoutPlayer />
+            <logicMonte:MonteCarloTreeSearchPlayer />
+        </x:Array>
+        <x:Array Type="{x:Type logic:PlayerBase}" x:Key="violetPlayersDataSource">
             <logic:HumanPlayer />
             <logicAlphaBeta:AlphaBetaPlayer />
             <logicScout:ScoutPlayer />
@@ -26,7 +31,8 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
             <RowDefinition Height="25"/>
-            <RowDefinition/>            
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="130"/>
@@ -44,7 +50,7 @@
         </TextBlock>
         <ComboBox 
             Grid.Row="1"
-            ItemsSource="{Binding Source={StaticResource playersDataSource}}" 
+            ItemsSource="{Binding Source={StaticResource orangePlayersDataSource}}" 
             SelectedValue="{Binding OrangePlayer}"
             />
         <Button 
@@ -69,7 +75,7 @@
         <ComboBox 
             Grid.Row="1"
             Grid.Column="2"
-            ItemsSource="{Binding Source={StaticResource playersDataSource}}" 
+            ItemsSource="{Binding Source={StaticResource violetPlayersDataSource}}" 
             SelectedValue="{Binding VioletPlayer}"
             />
         <Border
@@ -168,5 +174,11 @@
                 </Style>
             </Border.Style>
         </Border>
+        <Expander Header="Parametry" Grid.Row="3" IsExpanded="False">
+            <usr:TreeSearchParameters DataContext="{Binding OrangePlayer}" />
+        </Expander>
+        <Expander Header="Parametry" Grid.Row="3" Grid.Column="2" IsExpanded="False">
+            <usr:TreeSearchParameters DataContext="{Binding VioletPlayer}" />
+        </Expander>
     </Grid>
 </Window>

@@ -8,10 +8,22 @@ namespace Blokus.Logic.Scout
 {
     class ScoutPlayer : AIPlayer
     {
-        private const int MaxDepth = 6;
-        private const int MaxTreeRank = 15;
         private Heuristics _Heursitics = new ScoutHeuristics();
         private Move _LastMove;
+        private int _MaxDepth = 6;
+        private int _MaxTreeRank = 15;
+
+        public int MaxDepth
+        {
+            get { return _MaxDepth; }
+            set { _MaxDepth = value; }
+        }
+
+        public int MaxTreeRank
+        {
+            get { return _MaxTreeRank; }
+            set { _MaxTreeRank = value; }
+        }
 
         public override Move GetMove(GameState gameState)
         {
@@ -208,7 +220,7 @@ namespace Blokus.Logic.Scout
 
         public override string ToString()
         {
-            return "Nigga - Scout";
+            return "Scout";
         }
     }
 }

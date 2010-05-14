@@ -22,9 +22,22 @@ namespace Blokus.Logic.AlphaBeta
             (* Initial call *)
             alphabeta(origin, depth, -infinity, +infinity)
          */
+        private int _MaxDepth = 2;
+        private int _MaxTreeRank = 666;
 
-        private const int MaxDepth = 2;
-        private const int MaxTreeRank = 666;
+        public int MaxDepth
+        {
+            get { return _MaxDepth; }
+            set { _MaxDepth = value; }
+        }        
+
+        public int MaxTreeRank
+        {
+            get { return _MaxTreeRank; }
+            set { _MaxTreeRank = value; }
+        }
+
+
         private Move _LastMove;
         private AlphaBetaHeuristics _Heursitics = new AlphaBetaHeuristics();
 
