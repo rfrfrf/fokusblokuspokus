@@ -6,6 +6,7 @@ using System.Windows;
 
 namespace Blokus.Logic
 {
+    [Serializable]
     public class Move
     {
         public Piece Piece { get; set; }
