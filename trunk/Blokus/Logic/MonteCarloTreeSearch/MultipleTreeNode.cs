@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Blokus.Logic.MonteCarloTreeSearch
 {
+    [Serializable]
     public class MultipleTreeNode
     {
         public int visitCount = 0;
@@ -36,6 +37,11 @@ namespace Blokus.Logic.MonteCarloTreeSearch
         {
             //TODO: zrobic przeliczanie wartosci wezla
             return;
+        }
+
+        public bool IsLeaf()
+        {
+            return childrenList==null || childrenList.Count==0;
         }
     }
 }
