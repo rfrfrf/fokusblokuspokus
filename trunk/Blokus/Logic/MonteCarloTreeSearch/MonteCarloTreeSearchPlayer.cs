@@ -27,9 +27,10 @@ namespace Blokus.Logic.MonteCarloTreeSearch
 
         public override Move GetMove(GameState gameState)
         {
-            tree.mePlayer = me = gameState.CurrentPlayerColor;
+            //tree.mePlayer = me = gameState.CurrentPlayerColor;
             //tree.SelectNodeFromSubTree(tree.root, 
-            return null; //TODO: wyszukiwanie ruchu przy pomocy MCTS
+            return tree.MakeMove(gameState);
+            //return null; //TODO: wyszukiwanie ruchu przy pomocy MCTS
         }
 
         public override string ToString()

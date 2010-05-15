@@ -11,7 +11,7 @@ namespace Blokus.Logic.MonteCarloTreeSearch
     {
         public const double Cvalue = 1;
         public const double Wvalue = 100;
-        public Random r;
+        public static Random r = new Random();
         public MultipleTreeNode root = null;
 
         public Player mePlayer;
@@ -49,6 +49,19 @@ namespace Blokus.Logic.MonteCarloTreeSearch
             
         }
 
+        public Move MakeMove(GameState gs)
+        {
+            this.mePlayer = gs.CurrentPlayerColor;
+            MultipleTreeNode pomNode;
+            double pomval;
+            SelectNodeFromSubTree(root, out pomNode, out pomval);
+            int res = Playout(pomNode);
+            Backpropagate(res, pomNode);
+
+
+            return null;
+        }
+
         //public MultipleTreeNode Expansion(MultipleTreeNode selectedNode)
         //{
         //    if (selectedNode.childrenList==null || selectedNode.childrenList.Count == 0)
@@ -75,7 +88,7 @@ namespace Blokus.Logic.MonteCarloTreeSearch
                 movelist.Add(pomNode.move);
                 pomNode = pomNode.parentNode;
             }
-            while (pomNode != null);
+            while (pomNode != null && pomNode.move!=null);
 
             GameState gs = new GameState();
             for (int i = movelist.Count - 1; i >= 0; i--)
@@ -100,7 +113,11 @@ namespace Blokus.Logic.MonteCarloTreeSearch
 
         private void SelectNode(MultipleTreeNode node, out MultipleTreeNode maxNode, out double maxNodeFormula)
         {
-            GameState gs = PrepareGameState(node);
+            GameState gs=new GameState();
+            if (node.move != null)
+            {
+                gs = PrepareGameState(node);
+            }
             List<Move> moves = GameRules.GetMoves(gs);
             double globalMaxForm = double.NegativeInfinity;
             Move globalMaxMove = null;
@@ -113,7 +130,7 @@ namespace Blokus.Logic.MonteCarloTreeSearch
                 
                 foreach (Move m in moves)
                 {
-                    if ((pomNode = node.childrenList.Find(e => e.move == m)) != null)
+                    if (node.childrenList!=null && (pomNode = node.childrenList.Find(e => e.move == m)) != null)
                     {
                         pomformval = CountNode(pomNode);
                         if (globalMaxForm < pomformval)
@@ -148,7 +165,7 @@ namespace Blokus.Logic.MonteCarloTreeSearch
             else
             {
                 MultipleTreeNode nnode = new MultipleTreeNode(globalMaxMove, node);
-                //AddToTree(node, nnode);
+                AddToTree(node, nnode);
                 maxNode = nnode;
                 maxNodeFormula = globalMaxForm;
             }
@@ -191,7 +208,7 @@ namespace Blokus.Logic.MonteCarloTreeSearch
                 {
                     Move m = moves.ElementAt((int)r.NextDouble() * moves.Count);
                     gs.AddMove(m);
-                    block_counter--;
+                    block_counter=0;
                 }
                 else
                 {
