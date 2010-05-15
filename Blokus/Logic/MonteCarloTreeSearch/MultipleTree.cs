@@ -276,13 +276,15 @@ namespace Blokus.Logic.MonteCarloTreeSearch
             GameState gs = PrepareGameState(nnode);
             //bool myMove = gs.CurrentPlayerColor == mePlayer;
             int block_counter=0;//sprawdzenie, czy obaj gracze nie mogą wykonywać już ruchów
-
+            var heuristic = new AlphaBeta.AlphaBetaHeuristics();
             while (block_counter < 2)
             {
-                List<Move> moves = GameRules.GetMoves(gs);
+                heuristic.SortHand(gs);
+                List<Move> moves = GameRules.GetMoves(gs, r.Next(666) + 2);
                 if (moves.Count > 0)
                 {
-                    Move m = moves.ElementAt((int)r.NextDouble() * moves.Count);
+                    heuristic.SortMoves(gs, moves);
+                    Move m = moves.ElementAt(r.Next(moves.Count));
                     gs.AddMove(m);
                     block_counter=0;
                 }
