@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows;
+using System.Security.Permissions;
+using System.Runtime.Serialization;
 
 namespace Blokus.Logic
 {
@@ -35,6 +37,25 @@ namespace Blokus.Logic
             {
                 return Piece.GetHashCode() + pieceCount * Position.GetHashCode() + VariantNumber.GetHashCode();
             }
+        }
+
+        public Move() { }
+
+        protected Move(SerializationInfo info, StreamingContext context)
+        {
+            Piece = Pieces.GetImmutablePieces()[info.GetInt32("p")];
+            Position = new PiecePosition(info.GetInt32("x"), info.GetInt32("y"));
+            VariantNumber = info.GetInt32("v");
+        }
+        [SecurityPermissionAttribute(SecurityAction.Demand,
+        SerializationFormatter = true)]
+
+        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue("p", Piece.Id);
+            info.AddValue("x", Position.X);
+            info.AddValue("y", Position.Y);
+            info.AddValue("v", VariantNumber);
         }
     }
 }

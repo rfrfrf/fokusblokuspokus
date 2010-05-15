@@ -8,6 +8,35 @@ namespace Blokus.Logic
     [Serializable]
     public class Pieces
     {
+        private static IList<Piece> cachedPieces;
+
+        public static IList<Piece> GetImmutablePieces()
+        {
+            if (cachedPieces == null)
+            {
+                var result = new List<Piece>(){ 
+                Monomino01, 
+                Domino01, 
+                Triomino01, Triomino02, 
+                Tetramino01, Tetramino02, Tetramino03, Tetramino04, Tetramino05,
+                Pentamino01, Pentamino02, Pentamino03, Pentamino04, Pentamino05, Pentamino06,
+                Pentamino07, Pentamino08, Pentamino09, Pentamino10, Pentamino11, Pentamino12};
+
+                /*    result.Sort((x, y) =>
+                    {
+                        int a = x.Variants[0].CornersIndicies.Length;
+                        int b = y.Variants[0].CornersIndicies.Length;
+                        if (a != b)
+                        {
+                            return b.CompareTo(a);
+                        }
+                        return y.Variants[0].Squares.Length.CompareTo(x.Variants[0].Squares.Length);
+                    });*/
+                cachedPieces = result.ToArray();
+            }
+            return cachedPieces;
+        }
+
         public static List<Piece> GetAllPieces()
         {
             var result = new List<Piece>(){ 
@@ -18,16 +47,17 @@ namespace Blokus.Logic
                 Pentamino01, Pentamino02, Pentamino03, Pentamino04, Pentamino05, Pentamino06,
                 Pentamino07, Pentamino08, Pentamino09, Pentamino10, Pentamino11, Pentamino12};
 
-            result.Sort((x, y) => 
-            {
-                int a = x.Variants[0].CornersIndicies.Length;
-                int b = y.Variants[0].CornersIndicies.Length;
-                if (a != b)
+            /*    result.Sort((x, y) =>
                 {
-                    return b.CompareTo(a);
-                }
-                return y.Variants[0].Squares.Length.CompareTo(x.Variants[0].Squares.Length);
-            });
+                    int a = x.Variants[0].CornersIndicies.Length;
+                    int b = y.Variants[0].CornersIndicies.Length;
+                    if (a != b)
+                    {
+                        return b.CompareTo(a);
+                    }
+                    return y.Variants[0].Squares.Length.CompareTo(x.Variants[0].Squares.Length);
+                });*/
+
             return result;
         }
 

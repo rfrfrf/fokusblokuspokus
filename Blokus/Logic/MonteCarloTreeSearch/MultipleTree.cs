@@ -282,11 +282,11 @@ namespace Blokus.Logic.MonteCarloTreeSearch
             while (block_counter < 2)
             {
                 heuristic.SortHand(gs);
-                List<Move> moves = GameRules.GetMoves(gs, r.Next(666) + 2);
+                List<Move> moves = GameRules.GetMoves(gs, r.Next(888) + 2); //uzycie randa promuje ruchy z poczatku listy
                 if (moves.Count > 0)
                 {
                     heuristic.SortMoves(gs, moves);
-                    Move m = moves.ElementAt(r.Next(moves.Count));
+                    Move m = moves.ElementAt(r.Next(r.Next(moves.Count+1))); //uzycie 2 randow promuje ruchy z poczatku
                     gs.AddMove(m);
                     block_counter=0;
                 }
@@ -327,7 +327,8 @@ namespace Blokus.Logic.MonteCarloTreeSearch
             //{
             //    return node.victoryCount;
             //}
-            return r.NextDouble() * (node.victoryCount+1) / (node.visitCount+1);
+            return r.NextDouble() * (node.victoryCount+1.0) / (node.visitCount+10.0); 
+            //ocena 0.1 dla nieodweidzonych, 1.0 dla liczby zwyciestw dazaczecj do nieskonczonosci
         }
     }
 }
