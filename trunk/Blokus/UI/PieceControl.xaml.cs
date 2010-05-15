@@ -67,18 +67,20 @@ namespace Blokus.UI
         public void UpdatePiece()
         {
             MainCanvas.Children.Clear();
-
-            foreach (var square in Piece.Squares)
+            if (Piece != null)
             {
-                var border = new Border()
+                foreach (var square in Piece.Squares)
                 {
-                    Background = Brushes.AntiqueWhite,
-                    Width = SquareSize,
-                    Height = SquareSize
-                };
-                Canvas.SetLeft(border, SquareSize * square.X);
-                Canvas.SetTop(border, SquareSize * square.Y);
-                MainCanvas.Children.Add(border);
+                    var border = new Border()
+                    {
+                        Background = Brushes.AntiqueWhite,
+                        Width = SquareSize,
+                        Height = SquareSize
+                    };
+                    Canvas.SetLeft(border, SquareSize * square.X);
+                    Canvas.SetTop(border, SquareSize * square.Y);
+                    MainCanvas.Children.Add(border);
+                }
             }
         }
     }

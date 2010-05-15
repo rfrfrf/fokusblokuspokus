@@ -81,6 +81,7 @@ namespace Blokus.UI
             var orangeStart = new Ellipse();
             orangeStart.Margin = new Thickness(2);
             orangeStart.Fill = Brushes.Orange;
+            orangeStart.IsHitTestVisible = false;
             Grid.SetColumn(orangeStart, GameRules.OrangeStartPositionX);
             Grid.SetRow(orangeStart, GameRules.OrangeStartPositionY);
             MainGrid.Children.Add(orangeStart);
@@ -88,6 +89,7 @@ namespace Blokus.UI
             var violetStart = new Ellipse();
             violetStart.Margin = new Thickness(2);
             violetStart.Fill = Brushes.Violet;
+            violetStart.IsHitTestVisible = false;
             Grid.SetColumn(violetStart, GameRules.VioletStartPositionX);
             Grid.SetRow(violetStart, GameRules.VioletStartPositionY);
             MainGrid.Children.Add(violetStart);
