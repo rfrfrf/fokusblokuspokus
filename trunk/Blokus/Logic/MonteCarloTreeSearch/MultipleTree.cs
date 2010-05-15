@@ -18,6 +18,7 @@ namespace Blokus.Logic.MonteCarloTreeSearch
         public Player mePlayer;
 
         public MultipleTreeNode currentNode;
+        public int MovesCountWhenOpponentBlocked = int.MaxValue;//ilość ruchów po których przeciwnik się zablokował
 
         public MultipleTree()
         {
@@ -79,6 +80,7 @@ namespace Blokus.Logic.MonteCarloTreeSearch
 
 
             GameState pomgs = PrepareGameState(currentNode);
+            //pomgs.SwapCurrentPlayer();
             List<Move> someMoves = GameRules.GetMoves(pomgs);
             if (prevMoves.Count > 0 && someMoves.Exists(e => e.Equals(prevMoves.ElementAt(prevMoves.Count - 1))))//czyli każdy algorytm ma swoje osobne drzewo
             {
@@ -93,6 +95,16 @@ namespace Blokus.Logic.MonteCarloTreeSearch
                     currentNode = currentNode.childrenList.Find(e => e.move == prevMoves.ElementAt(prevMoves.Count - 1));
                 }
             }
+            else
+            {
+                if (prevMoves.Count > 1 && MovesCountWhenOpponentBlocked==int.MaxValue)
+                {
+                    MovesCountWhenOpponentBlocked = prevMoves.Count;
+                }
+                GameState pomgs2 = PrepareGameState(currentNode);
+                pomgs2.SwapCurrentPlayer();
+                List<Move> someMoves2 = GameRules.GetMoves(pomgs2);
+            }
 
             
             //if(prevMoves.Count>0 && )
@@ -106,7 +118,7 @@ namespace Blokus.Logic.MonteCarloTreeSearch
             this.mePlayer = gs.CurrentPlayerColor;
             MultipleTreeNode pomNode;
             double pomval;
-            SelectNodeFromSubTree(currentNode, out pomNode, out pomval);
+            SelectNodeFromSubTree(currentNode, out pomNode, out pomval, gs);
             int res = Playout(pomNode);
             Backpropagate(res, pomNode);
 
@@ -171,7 +183,10 @@ namespace Blokus.Logic.MonteCarloTreeSearch
             for (int i = movelist.Count - 1; i >= 0; i--)
             {
                 gs.AddMove(movelist.ElementAt(i));
-                gs.SwapCurrentPlayer();
+                if (movelist.Count - i < MovesCountWhenOpponentBlocked)
+                {
+                    gs.SwapCurrentPlayer();
+                }
             }
             return gs;
         }
@@ -181,20 +196,20 @@ namespace Blokus.Logic.MonteCarloTreeSearch
             treeNode.childrenList.Add(nodeToAdd);
         }
 
-        public void SelectNodeFromSubTree(MultipleTreeNode startNode, out MultipleTreeNode maxNode, out double maxNodeFormula)
+        public void SelectNodeFromSubTree(MultipleTreeNode startNode, out MultipleTreeNode maxNode, out double maxNodeFormula, GameState gs)
         {
-            SelectNode(startNode, out maxNode, out maxNodeFormula);
+            SelectNode(startNode, out maxNode, out maxNodeFormula, gs);
         }
 
 
 
-        private void SelectNode(MultipleTreeNode node, out MultipleTreeNode maxNode, out double maxNodeFormula)
+        private void SelectNode(MultipleTreeNode node, out MultipleTreeNode maxNode, out double maxNodeFormula, GameState gs)
         {
-            GameState gs=new GameState();
-            if (node.move != null)
-            {
-                gs = PrepareGameState(node);
-            }
+            //GameState gs=new GameState();
+            //if (node.move != null)
+            //{
+            //    gs = PrepareGameState(node);
+            //}
             List<Move> moves = GameRules.GetMoves(gs);
             double globalMaxForm = double.NegativeInfinity;
             Move globalMaxMove = null;
@@ -238,7 +253,7 @@ namespace Blokus.Logic.MonteCarloTreeSearch
             node.visitCount++;
             if (isGlobalMaxFromTree)
             {
-                SelectNode(node.childrenList.Find(e => e.move == globalMaxMove), out maxNode, out maxNodeFormula);
+                SelectNode(node.childrenList.Find(e => e.move == globalMaxMove), out maxNode, out maxNodeFormula, gs);
             }
             else
             {
