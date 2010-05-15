@@ -10,6 +10,7 @@ using Blokus.UI;
 
 namespace Blokus.ViewModel
 {
+    [Serializable]
     public class GameCoordinator : INotifyPropertyChanged
     {
         private PlayerBase _OrangePlayer;

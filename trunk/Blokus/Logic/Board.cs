@@ -6,6 +6,7 @@ using System.Windows;
 
 namespace Blokus.Logic
 {
+    [Serializable]
     public class Board
     {
         public const int BoardSize = 14;

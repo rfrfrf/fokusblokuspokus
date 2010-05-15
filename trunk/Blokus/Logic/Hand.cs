@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Blokus.Logic
 {
+    [Serializable]
     public class Hand
     {
         public List<Piece> HandPieces { get; set; }

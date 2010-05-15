@@ -6,6 +6,7 @@ using System.Windows;
 
 namespace Blokus.Logic
 {
+    [Serializable]
     public class Piece
     {
         public int Id { get; set; }

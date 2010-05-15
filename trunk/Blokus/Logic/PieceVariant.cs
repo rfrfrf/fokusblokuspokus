@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Blokus.Logic
 {
+    [Serializable]
     public class PieceVariant
     {
         public PiecePosition[] Squares { get; private set; }

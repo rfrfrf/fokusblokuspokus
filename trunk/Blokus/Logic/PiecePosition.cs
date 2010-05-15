@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Blokus.Logic
 {
+    [Serializable]
     public struct PiecePosition
     {
         public int X;

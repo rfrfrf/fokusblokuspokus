@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Blokus.Logic
 {
+    [Serializable]
     public class GameState
     {
         public Player CurrentPlayerColor { get; set; }
@@ -13,6 +14,8 @@ namespace Blokus.Logic
         public Board Board { get; set; }
         public bool IsLastOrangeMoveMonomino { private set; get; }
         public bool IsLastVioletMoveMonomino { private set; get; }
+
+        public List<Move> AllMoves { private set; get; }
 
         private bool IsLastMoveMonomino
         {
@@ -45,6 +48,7 @@ namespace Blokus.Logic
             Board = new Board();
             OrangeHand = new Hand();
             VioletHand = new Hand();
+            AllMoves = new List<Move>();
         }
 
         public void AddMove(Move move)
@@ -52,12 +56,14 @@ namespace Blokus.Logic
             IsLastMoveMonomino = move.PieceVariant.Squares.Length == 1;
             Board.PlacePiece(move, CurrentPlayerColor);
             CurrentPlayerHand.Remove(move);
+            AllMoves.Add(move);
         }
 
         public void DelMove(Move move)
         {
             Board.RemovePiece(move);
             CurrentPlayerHand.Add(move);
+            AllMoves.Remove(move);
         }
 
         public void SwapCurrentPlayer()

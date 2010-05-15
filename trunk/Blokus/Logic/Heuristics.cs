@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Blokus.Logic
 {
+    [Serializable]
     public abstract class Heuristics
     {
         public abstract double GetBoardEvaluation(GameState gameState);
