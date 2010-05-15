@@ -20,8 +20,19 @@ namespace Blokus.ViewModel
         private BackgroundWorker _Worker;
         private int _CurrentVariantNumber;
         private Piece _CurrentPiece;
+        private int _playedGames = 0;
 
         #region Properties
+
+        public int PlayedGames
+        {
+            get { return _playedGames; }
+            set 
+            { 
+                _playedGames = value;
+                NotifyPropertyChanged("PlayedGames");
+            }
+        }
 
         public PieceVariant CurrentPieceVariant
         {
@@ -112,12 +123,17 @@ namespace Blokus.ViewModel
 
         #endregion // Properties
 
-        public RelayCommand NewGameCommand { get; private set; }        
+        public RelayCommand NewGameCommand { get; private set; }
+
+        public RelayCommand TrainCommand { get; private set; }  
 
         public GameCoordinator()
         {
             NewGameCommand = new RelayCommand((arg) => NewGame(),
-                delegate(object arg) { return OrangePlayer != null && VioletPlayer != null; });          
+                delegate(object arg) { return OrangePlayer != null && VioletPlayer != null; });
+
+            TrainCommand = new RelayCommand((arg) => NewTraining(),
+                delegate(object arg) { return OrangePlayer != null && VioletPlayer != null; });   
         }
 
         public void OnHandControlClick(HandControl handControl, Piece piece)
@@ -161,6 +177,7 @@ namespace Blokus.ViewModel
             if (player.InvalidateMove(GameState, move))
             {
                 player.MoveSemaphore.Release(1);
+                CurrentPiece = null;
             }
         }
 
@@ -183,8 +200,27 @@ namespace Blokus.ViewModel
             }
         }
 
+        private void NewTraining()
+        {
+            if (_Worker == null || !_Worker.IsBusy)
+            {
+                IsVioletWinner = false;
+                IsOrangeWinner = false;
+                GameState = new GameState();
+                RefreshUI();
+                OrangePlayer.OnGameStart();
+                VioletPlayer.OnGameStart();
+                StartGameTrainer();
+            }
+            else
+            {
+                CurrentPlayer.CancelMove();
+                _Worker.CancelAsync();
+            }
+        }
+
         /// <returns>Zwraca czy gra się zakonczyla</returns>
-        private bool MakeMove() 
+        private bool MakeMove(bool updateLayout) 
         {
             Move move = CurrentPlayer.GetMove(GameState);
             if (move != null)
@@ -198,8 +234,10 @@ namespace Blokus.ViewModel
             GameState.SwapCurrentPlayer();
             
             _PreviousMove = move;
-            RefreshUI();
-            
+            if (updateLayout)
+            {
+                RefreshUI();
+            }
             return false;
         }
 
@@ -237,6 +275,17 @@ namespace Blokus.ViewModel
             NotifyPropertyChanged("IsGameInProgress");
         }
 
+        private void StartGameTrainer()
+        {
+            PlayedGames = 0;
+            _Worker = new BackgroundWorker();
+            _Worker.WorkerSupportsCancellation = true;
+            _Worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(GameWorkerCompleted);
+            _Worker.DoWork += new DoWorkEventHandler(GameTrainer);
+            _Worker.RunWorkerAsync(null);
+            NotifyPropertyChanged("IsGameInProgress");
+        }
+
         private void GameWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             NotifyPropertyChanged("IsGameInProgress");
@@ -245,11 +294,25 @@ namespace Blokus.ViewModel
             ShowGameResult();
         }
 
+        private void GameTrainer(object sender, DoWorkEventArgs e)
+        {
+            while (!_Worker.CancellationPending)
+            {
+                if (MakeMove(false))
+                {
+                    IsVioletWinner = false;
+                    IsOrangeWinner = false;
+                    GameState = new GameState();
+                    PlayedGames++;
+                }
+            }
+        }
+
         private void GameWorker(object sender, DoWorkEventArgs e)
         {
             while (!_Worker.CancellationPending)
             {
-                if (MakeMove())
+                if (MakeMove(true))
                 {
                     break;
                 }
