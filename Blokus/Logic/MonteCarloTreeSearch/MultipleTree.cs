@@ -55,6 +55,12 @@ namespace Blokus.Logic.MonteCarloTreeSearch
 
         public Move MakeMove(GameState gs)
         {
+            List<Move> allavMoves = GameRules.GetMoves(gs);
+            if (allavMoves.Count == 0)//gracz zablokowany
+            {
+                return null;
+            }
+
             List<Move> prevMoves = gs.AllMoves;
             if (currentNode == null)
             {
@@ -70,8 +76,11 @@ namespace Blokus.Logic.MonteCarloTreeSearch
             }
 
 
+
+
             GameState pomgs = PrepareGameState(currentNode);
-            if (prevMoves.Count > 0 && GameRules.GetMoves(pomgs).Exists(e => e.Equals(prevMoves.ElementAt(prevMoves.Count - 1))))//czyli każdy algorytm ma swoje osobne drzewo
+            List<Move> someMoves = GameRules.GetMoves(pomgs);
+            if (prevMoves.Count > 0 && someMoves.Exists(e => e.Equals(prevMoves.ElementAt(prevMoves.Count - 1))))//czyli każdy algorytm ma swoje osobne drzewo
             {
                 if (!currentNode.childrenList.Exists(e => e.move.Equals(prevMoves.ElementAt(prevMoves.Count - 1))))//currentNode nie ma odpowiedniego dziecka
                 {
@@ -92,10 +101,7 @@ namespace Blokus.Logic.MonteCarloTreeSearch
 
             //w tym miejscu currentNode na właściwym miejscu
 
-            if (prevMoves.Count > 1 && currentNode.move == null)//gracz zablokowany
-            {
-                return null;
-            }
+            
            
             this.mePlayer = gs.CurrentPlayerColor;
             MultipleTreeNode pomNode;
@@ -114,11 +120,7 @@ namespace Blokus.Logic.MonteCarloTreeSearch
                 currentNode = currentNode.childrenList.ElementAt(0);
                 resMove = currentNode.move;
             }
-            List<Move> allavMoves = GameRules.GetMoves(gs);
-            if (allavMoves.Count==0)
-            {
-                return null;
-            }
+            
 
 
             if (resMove != null && !allavMoves.Exists(e => e.Equals(resMove)))
