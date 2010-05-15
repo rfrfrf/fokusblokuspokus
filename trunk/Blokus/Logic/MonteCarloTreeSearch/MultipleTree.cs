@@ -92,6 +92,11 @@ namespace Blokus.Logic.MonteCarloTreeSearch
 
             //w tym miejscu currentNode na właściwym miejscu
 
+            if (prevMoves.Count > 1 && currentNode.move == null)//gracz zablokowany
+            {
+                return null;
+            }
+           
             this.mePlayer = gs.CurrentPlayerColor;
             MultipleTreeNode pomNode;
             double pomval;
@@ -109,8 +114,18 @@ namespace Blokus.Logic.MonteCarloTreeSearch
                 currentNode = currentNode.childrenList.ElementAt(0);
                 resMove = currentNode.move;
             }
+            List<Move> allavMoves = GameRules.GetMoves(gs);
+            if (allavMoves.Count==0)
+            {
+                return null;
+            }
 
-            
+
+            if (resMove != null && !allavMoves.Exists(e => e.Equals(resMove)))
+            {
+
+                throw new ArgumentException("zły ruch");
+            }
 
 
 
@@ -218,6 +233,7 @@ namespace Blokus.Logic.MonteCarloTreeSearch
                 }
             }
 
+            node.visitCount++;
             if (isGlobalMaxFromTree)
             {
                 SelectNode(node.childrenList.Find(e => e.move == globalMaxMove), out maxNode, out maxNodeFormula);
