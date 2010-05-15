@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Collections;
 
 namespace Blokus.Logic.MonteCarloTreeSearch
 {
@@ -16,9 +17,12 @@ namespace Blokus.Logic.MonteCarloTreeSearch
 
         public Player mePlayer;
 
+        public MultipleTreeNode currentNode;
+
         public MultipleTree()
         {
             root = new MultipleTreeNode();
+            currentNode = null;// new MultipleTreeNode();
 
             //GameState gs = new GameState();
             //root.childrenList = GameRules.GetMoves(gs);
@@ -51,15 +55,67 @@ namespace Blokus.Logic.MonteCarloTreeSearch
 
         public Move MakeMove(GameState gs)
         {
+            List<Move> prevMoves = gs.AllMoves;
+            if (currentNode == null)
+            {
+                currentNode = root;
+            }
+            if (prevMoves.Count == 1)// && !root.childrenList.Exists(e=>e.move==prevMoves.ElementAt(0)))
+            {
+                MultipleTreeNode pomroot = new MultipleTreeNode();
+                pomroot.childrenList.Add(root);
+                root.move = prevMoves.ElementAt(0);
+                root.parentNode = pomroot;
+                root = pomroot;
+            }
+
+
+            GameState pomgs = PrepareGameState(currentNode);
+            if (prevMoves.Count > 0 && GameRules.GetMoves(pomgs).Exists(e => e.Equals(prevMoves.ElementAt(prevMoves.Count - 1))))//czyli każdy algorytm ma swoje osobne drzewo
+            {
+                if (!currentNode.childrenList.Exists(e => e.move.Equals(prevMoves.ElementAt(prevMoves.Count - 1))))//currentNode nie ma odpowiedniego dziecka
+                {
+                    MultipleTreeNode chpom = new MultipleTreeNode(prevMoves.ElementAt(prevMoves.Count - 1), currentNode);
+                    currentNode.childrenList.Add(chpom);
+                    currentNode = chpom;
+                }
+                else
+                {
+                    currentNode = currentNode.childrenList.Find(e => e.move == prevMoves.ElementAt(prevMoves.Count - 1));
+                }
+            }
+
+            
+            //if(prevMoves.Count>0 && )
+
+
+
+            //w tym miejscu currentNode na właściwym miejscu
+
             this.mePlayer = gs.CurrentPlayerColor;
             MultipleTreeNode pomNode;
             double pomval;
-            SelectNodeFromSubTree(root, out pomNode, out pomval);
+            SelectNodeFromSubTree(currentNode, out pomNode, out pomval);
             int res = Playout(pomNode);
             Backpropagate(res, pomNode);
 
+            Move resMove = null;
+            if (currentNode.childrenList.Count > 0)
+            {
 
-            return null;
+                //currentNode.childrenList.Sort(new Comparison<MultipleTreeNode>(delegate(MultipleTreeNode e, MultipleTreeNode k) { return e.victoryCount - k.victoryCount; }));
+                currentNode.childrenList.Sort((a, b) => { return a.victoryCount - b.victoryCount; });
+
+                currentNode = currentNode.childrenList.ElementAt(0);
+                resMove = currentNode.move;
+            }
+
+            
+
+
+
+
+            return resMove;
         }
 
         //public MultipleTreeNode Expansion(MultipleTreeNode selectedNode)
@@ -81,6 +137,10 @@ namespace Blokus.Logic.MonteCarloTreeSearch
 
         private GameState PrepareGameState(MultipleTreeNode node)
         {
+            if (node.move == null)
+            {
+                return new GameState();
+            }
             List<Move> movelist = new List<Move>();
             MultipleTreeNode pomNode = node;
             do

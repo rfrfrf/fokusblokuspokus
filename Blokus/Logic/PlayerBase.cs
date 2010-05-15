@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Blokus.Logic
 {
+    [Serializable]
     public abstract class PlayerBase
     {
         public abstract Move GetMove(GameState gameState);

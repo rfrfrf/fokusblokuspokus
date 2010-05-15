@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Blokus.Logic
 {
+    [Serializable]
     public abstract class AIPlayer : PlayerBase
     {
         #region PlayerBase Members

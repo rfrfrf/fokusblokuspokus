@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Blokus.Logic
 {
+    [Serializable]
     public class Pieces
     {
         public static List<Piece> GetAllPieces()
