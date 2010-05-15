@@ -21,7 +21,7 @@ namespace Blokus.Logic.MonteCarloTreeSearch
             victoryCount = 0;
             move = null;
             parentNode = null;
-            childrenList = null;
+            childrenList = new List<MultipleTreeNode>();
         }
 
         public MultipleTreeNode(Move _move, MultipleTreeNode _parentNode)
@@ -30,7 +30,7 @@ namespace Blokus.Logic.MonteCarloTreeSearch
             victoryCount = 0;
             move = _move;
             parentNode = _parentNode;
-            childrenList = null;
+            childrenList = new List<MultipleTreeNode>();
         }
 
         public void ComputeAverage(int r)
