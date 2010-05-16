@@ -10,27 +10,38 @@ namespace Blokus.Logic.MonteCarloTreeSearch
 {
     public class MultipleTree
     {
-        public const double Cvalue = 1;
-        public const double Wvalue = 100;
-        public static Random r = new Random();
-        public MultipleTreeNode root = null;
+        private const double Cvalue = 1;
+        private const double Wvalue = 100;
+        private static Random r = new Random();
+        private static MultipleTreeNode root = null;
 
-        public Player mePlayer;
+        private Player mePlayer;
 
-        public MultipleTreeNode currentNode;
-        public int MovesCountWhenOpponentBlocked = int.MaxValue;//ilość ruchów po których przeciwnik się zablokował
+        private static MultipleTreeNode currentNode;
+        private int MovesCountWhenOpponentBlocked;// = int.MaxValue;//ilość ruchów po których przeciwnik się zablokował
+        //private static int AllMadeMoves;//sprawdzanie czy nastąpił ruch
+        private static bool isOpponentBlocked;//czy przeciwnik się zablokował
+        private bool playsWithMCTS;
+        private static bool przesuniecieWDrzewie;//gdy zaczyna jako drugi z nie-MCTS
+        private static bool wczytaneZPliku;//gdy wczytano z pliku
 
         public MultipleTree()
         {
-            root = new MultipleTreeNode();
+            //root = new MultipleTreeNode();
             currentNode = null;// new MultipleTreeNode();
-
+            MovesCountWhenOpponentBlocked = int.MaxValue;
+            isOpponentBlocked = false;
+            playsWithMCTS = true;
+            przesuniecieWDrzewie = false;
+            //////////////////////////////////
+            //wczytaneZPliku = false;
+            /////////////////////////////////
             //GameState gs = new GameState();
             //root.childrenList = GameRules.GetMoves(gs);
         }
 
 
-        public void SaveTree(string filename)
+        public static void SaveTree(string filename)
         {
             FileStream fs = new FileStream(filename, FileMode.Create);
             BinaryFormatter bf = new BinaryFormatter();
@@ -38,7 +49,7 @@ namespace Blokus.Logic.MonteCarloTreeSearch
             fs.Close();
         }
 
-        public void ReadTree(string filename)
+        public static void ReadTree(string filename)
         {
             FileStream fs;
             try
@@ -46,19 +57,24 @@ namespace Blokus.Logic.MonteCarloTreeSearch
                 fs = new FileStream(filename, FileMode.Open);
                 BinaryFormatter bf = new BinaryFormatter();
                 root = (MultipleTreeNode)bf.Deserialize(fs);
+                wczytaneZPliku = true;
                 fs.Close();
             }
             catch (Exception)
             {
+                root = new MultipleTreeNode();
+                wczytaneZPliku = false;
             }
             
         }
 
         public Move MakeMove(GameState gs)
         {
+            //AllMadeMoves++;// = prevMoves.Count;
             List<Move> allavMoves = GameRules.GetMoves(gs);
             if (allavMoves.Count == 0)//gracz zablokowany
             {
+                isOpponentBlocked = true;
                 return null;
             }
 
@@ -67,14 +83,14 @@ namespace Blokus.Logic.MonteCarloTreeSearch
             {
                 currentNode = root;
             }
-            if (prevMoves.Count == 1)// && !root.childrenList.Exists(e=>e.move==prevMoves.ElementAt(0)))
-            {
-                MultipleTreeNode pomroot = new MultipleTreeNode();
-                pomroot.childrenList.Add(root);
-                root.move = prevMoves.ElementAt(0);
-                root.parentNode = pomroot;
-                root = pomroot;
-            }
+            //if (prevMoves.Count == 1 && !playsWithMCTS)// && !root.childrenList.Exists(e=>e.move==prevMoves.ElementAt(0)))
+            //{
+            //    MultipleTreeNode pomroot = new MultipleTreeNode();
+            //    pomroot.childrenList.Add(root);
+            //    root.move = prevMoves.ElementAt(0);
+            //    root.parentNode = pomroot;
+            //    root = pomroot;
+            //}
 
 
 
@@ -82,8 +98,18 @@ namespace Blokus.Logic.MonteCarloTreeSearch
             GameState pomgs = PrepareGameState(currentNode);
             //pomgs.SwapCurrentPlayer();
             List<Move> someMoves = GameRules.GetMoves(pomgs);
-            if (prevMoves.Count > 0 && someMoves.Exists(e => e.Equals(prevMoves.ElementAt(prevMoves.Count - 1))))//czyli każdy algorytm ma swoje osobne drzewo
+            if (prevMoves.Count > 0 && someMoves.Exists(e => e.Equals(prevMoves.ElementAt(prevMoves.Count - 1))))//czyli każdy algorytm ma swoje osobne drzewo LUB gra z nie-MCTS
             {
+                playsWithMCTS = false;
+                if (prevMoves.Count == 1 && !playsWithMCTS && !przesuniecieWDrzewie && !wczytaneZPliku)// && !root.childrenList.Exists(e=>e.move==prevMoves.ElementAt(0)))
+                {
+                    MultipleTreeNode pomroot = new MultipleTreeNode();
+                    pomroot.childrenList.Add(root);
+                    root.move = prevMoves.ElementAt(0);
+                    root.parentNode = pomroot;
+                    root = pomroot;
+                    przesuniecieWDrzewie = true;
+                }
                 if (!currentNode.childrenList.Exists(e => e.move.Equals(prevMoves.ElementAt(prevMoves.Count - 1))))//currentNode nie ma odpowiedniego dziecka
                 {
                     MultipleTreeNode chpom = new MultipleTreeNode(prevMoves.ElementAt(prevMoves.Count - 1), currentNode);
@@ -92,12 +118,13 @@ namespace Blokus.Logic.MonteCarloTreeSearch
                 }
                 else
                 {
-                    currentNode = currentNode.childrenList.Find(e => e.move == prevMoves.ElementAt(prevMoves.Count - 1));
+                    currentNode = currentNode.childrenList.Find(e => e.move.Equals(prevMoves.ElementAt(prevMoves.Count - 1)));
                 }
+                
             }
             else
             {
-                if (prevMoves.Count > 1 && MovesCountWhenOpponentBlocked==int.MaxValue)
+                if ((prevMoves.Count > 1 && MovesCountWhenOpponentBlocked == int.MaxValue && !playsWithMCTS) || (prevMoves.Count > 1 && playsWithMCTS && isOpponentBlocked && MovesCountWhenOpponentBlocked == int.MaxValue))// && AllMadeMoves!=prevMoves.Count)
                 {
                     MovesCountWhenOpponentBlocked = prevMoves.Count;
                 }
@@ -105,7 +132,7 @@ namespace Blokus.Logic.MonteCarloTreeSearch
                 pomgs2.SwapCurrentPlayer();
                 List<Move> someMoves2 = GameRules.GetMoves(pomgs2);
             }
-
+            
             
             //if(prevMoves.Count>0 && )
 
