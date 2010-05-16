@@ -7,6 +7,7 @@ using Blokus.Misc;
 using System.ComponentModel;
 using System.Threading;
 using Blokus.UI;
+using System.Windows;
 
 namespace Blokus.ViewModel
 {
@@ -282,7 +283,7 @@ namespace Blokus.ViewModel
             _Worker.WorkerSupportsCancellation = true;
             _Worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(GameWorkerCompleted);
             _Worker.DoWork += new DoWorkEventHandler(GameTrainer);
-            _Worker.RunWorkerAsync(null);
+            _Worker.RunWorkerAsync(null);            
             NotifyPropertyChanged("IsGameInProgress");
         }
 
@@ -292,6 +293,10 @@ namespace Blokus.ViewModel
             OrangePlayer.OnGameEnd();
             VioletPlayer.OnGameEnd();
             ShowGameResult();
+            if (e.Error != null)
+            {
+                MessageBox.Show(e.Error.ToString());
+            }
         }
 
         private void GameTrainer(object sender, DoWorkEventArgs e)

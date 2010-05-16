@@ -3,7 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blokus", "Blokus\Blokus.csproj", "{B4988AE9-5924-4330-BBD3-47FA82C57F6D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlokusTest", "TestProject1\BlokusTest.csproj", "{8E1F1984-4F0C-4D01-AD71-EB03CAFF127A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{00BB7504-D8AA-4080-AF55-5E8797D62C5F}"
+	ProjectSection(SolutionItems) = preProject
+		Blokus.vsmdi = Blokus.vsmdi
+		LocalTestRun.testrunconfig = LocalTestRun.testrunconfig
+	EndProjectSection
+EndProject
 Global
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = Blokus.vsmdi
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -13,6 +24,10 @@ Global
 		{B4988AE9-5924-4330-BBD3-47FA82C57F6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B4988AE9-5924-4330-BBD3-47FA82C57F6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B4988AE9-5924-4330-BBD3-47FA82C57F6D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E1F1984-4F0C-4D01-AD71-EB03CAFF127A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E1F1984-4F0C-4D01-AD71-EB03CAFF127A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E1F1984-4F0C-4D01-AD71-EB03CAFF127A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E1F1984-4F0C-4D01-AD71-EB03CAFF127A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

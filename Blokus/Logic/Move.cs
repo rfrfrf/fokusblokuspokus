@@ -9,7 +9,7 @@ using System.Runtime.Serialization;
 namespace Blokus.Logic
 {
     [Serializable]
-    public class Move
+    public class Move : ISerializable 
     {
         public Piece Piece { get; set; }
         public PiecePosition Position { get; set; }
@@ -43,16 +43,16 @@ namespace Blokus.Logic
 
         protected Move(SerializationInfo info, StreamingContext context)
         {
-            Piece = Pieces.GetImmutablePieces()[info.GetInt32("p")];
+            Piece = Pieces.GetImmutablePieces()[info.GetInt32("p")-1];
             Position = new PiecePosition(info.GetInt32("x"), info.GetInt32("y"));
             VariantNumber = info.GetInt32("v");
         }
+
         [SecurityPermissionAttribute(SecurityAction.Demand,
         SerializationFormatter = true)]
-
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue("p", Piece.Id);
+            info.AddValue("p", Piece.Id);            
             info.AddValue("x", Position.X);
             info.AddValue("y", Position.Y);
             info.AddValue("v", VariantNumber);
