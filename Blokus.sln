@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		LocalTestRun.testrunconfig = LocalTestRun.testrunconfig
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TreeMerger", "TreeMerger\TreeMerger.csproj", "{8E1848E5-2FBA-4AEC-94E1-8882A813592D}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Blokus.vsmdi
@@ -28,6 +30,10 @@ Global
 		{8E1F1984-4F0C-4D01-AD71-EB03CAFF127A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E1F1984-4F0C-4D01-AD71-EB03CAFF127A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8E1F1984-4F0C-4D01-AD71-EB03CAFF127A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E1848E5-2FBA-4AEC-94E1-8882A813592D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E1848E5-2FBA-4AEC-94E1-8882A813592D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E1848E5-2FBA-4AEC-94E1-8882A813592D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E1848E5-2FBA-4AEC-94E1-8882A813592D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -250,7 +250,6 @@ namespace Blokus.Logic.MonteCarloTreeSearch
                 }
             }
 
-            node.visitCount++;
             if (isGlobalMaxFromTree)
             {
                 SelectNode(node.childrenList.Find(e => e.move == globalMaxMove), out maxNode, out maxNodeFormula, gs);
@@ -321,6 +320,7 @@ namespace Blokus.Logic.MonteCarloTreeSearch
             do
             {
                 pom.victoryCount += result;
+                pom.visitCount++;
                 pom = pom.parentNode;
 
             } while (pom.parentNode != null);
