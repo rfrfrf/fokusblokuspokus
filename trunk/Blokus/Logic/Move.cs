@@ -60,7 +60,7 @@ namespace Blokus.Logic
             return _SerializedMove;
         }
 
-        public Move() { }
+     //   public Move() { }
 
         public Move(int move)
         {

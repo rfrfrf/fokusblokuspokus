@@ -169,12 +169,7 @@ namespace Blokus.ViewModel
             {
                 return;
             }
-            var move = new Move()
-            {
-                Piece = CurrentPiece,
-                Position = position,
-                VariantNumber = _CurrentVariantNumber % CurrentPiece.Variants.Length
-            };
+            var move = new Move(CurrentPiece, position, _CurrentVariantNumber % CurrentPiece.Variants.Length);
             if (player.InvalidateMove(GameState, move))
             {
                 player.MoveSemaphore.Release(1);

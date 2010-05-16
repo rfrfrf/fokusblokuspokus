@@ -98,12 +98,7 @@ namespace Blokus.Logic
                             }
                             if (isOk)
                             {
-                                result.Add(new Move()
-                                {
-                                    Piece = piece,
-                                    VariantNumber = variant,
-                                    Position = piecePos
-                                });
+                                result.Add(new Move(piece, piecePos, variant));
                                 moveCount--;
                                 if (moveCount <= 0)
                                 {
