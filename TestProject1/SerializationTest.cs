@@ -76,6 +76,7 @@ namespace TestProject1
             var actual = (Move)bf.Deserialize(ms);
             Assert.AreEqual(move, actual);
 
+
             move = new Move();
             move.Piece = Pieces.Tetramino05;
             move.Position = new PiecePosition(9, 0);
@@ -86,6 +87,59 @@ namespace TestProject1
             ms.Position = 0;
             actual = (Move)bf.Deserialize(ms);
             Assert.AreEqual(move, actual);
+
+
+            move = new Move(3);
+            ms = new MemoryStream();
+            bf = new BinaryFormatter();
+            bf.Serialize(ms, move);
+            ms.Position = 0;
+            actual = (Move)bf.Deserialize(ms);
+            Assert.AreEqual(move, actual);
+
+
+            move = new Move(1);
+            actual = new Move();
+            actual.Piece = Pieces.Monomino01;
+            actual.Position = new PiecePosition(0, 0);
+            actual.VariantNumber = 0;
+            Assert.AreEqual(move, actual);
+
+
+
+            int size = 4096;
+            var moves = new Move[size];
+            for (int i = 0; i < size; i++)
+            {
+                moves[i] = new Move(1 + i %3);
+            }
+            ms = new MemoryStream();
+            bf = new BinaryFormatter();
+            bf.Serialize(ms, moves);
+            ms.Position = 0;
+            var actuals = (Move[])bf.Deserialize(ms);
+            Assert.AreEqual(moves.Length, actuals.Length);
+            for (int i = 0; i < actuals.Length; i++)
+            {
+                Assert.AreEqual(moves[i], actuals[i]);
+            }
+
+
+            var movesList = new List<Move>(size);
+            for (int i = 0; i < size; i++)
+            {
+                movesList.Add(new Move(1 + i % 3));
+            }
+            ms = new MemoryStream();
+            bf = new BinaryFormatter();
+            bf.Serialize(ms, movesList);
+            ms.Position = 0;
+            var actualsList = (List<Move>)bf.Deserialize(ms);
+            Assert.AreEqual(movesList.Count, actualsList.Count);
+            for (int i = 0; i < actualsList.Count; i++)
+            {
+                Assert.AreEqual(movesList[i], actualsList[i]);
+            }   
         }
     }
 }
