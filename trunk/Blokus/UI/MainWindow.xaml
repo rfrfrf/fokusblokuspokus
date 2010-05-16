@@ -9,6 +9,7 @@
     xmlns:logicMonte="clr-namespace:Blokus.Logic.MonteCarloTreeSearch"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     Title="Blokus Duo" 
+        Closing="Window_Closing"
 
         MouseWheel="Window_MouseWheel" Height="516" Width="657">
     

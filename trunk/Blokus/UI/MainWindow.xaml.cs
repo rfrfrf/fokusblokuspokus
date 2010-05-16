@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using Blokus.ViewModel;
 using Blokus.Misc;
 using Blokus.Logic;
+using Blokus.Logic.MonteCarloTreeSearch;
 
 namespace Blokus.UI
 {
@@ -26,6 +27,8 @@ namespace Blokus.UI
         {
             this.DataContext = new GameCoordinator();
             InitializeComponent();
+            MultipleTree.ReadTree(MonteCarloTreeSearchPlayer.filename);// = new MultipleTree();
+            //MonteCarloTreeSearchPlayer.tree.ReadTree(MonteCarloTreeSearchPlayer.filename);
         }
 
         void Board_Click(object sender, BoardClickEventArgs e)
@@ -51,6 +54,11 @@ namespace Blokus.UI
 
             Canvas.SetLeft(PieceControl, pos.X - squareSize/2);
             Canvas.SetTop(PieceControl, pos.Y - squareSize/2);
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            MultipleTree.SaveTree(MonteCarloTreeSearchPlayer.filename);
         }
     }
 }

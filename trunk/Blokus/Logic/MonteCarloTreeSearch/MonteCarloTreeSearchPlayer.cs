@@ -7,22 +7,22 @@ namespace Blokus.Logic.MonteCarloTreeSearch
 {
     class MonteCarloTreeSearchPlayer : AIPlayer
     {
-        string filename = "tree.dat";
-        Player me;
-        MultipleTree tree;
+        public const string filename = "tree.dat";
+        //Player me;
+        public MultipleTree tree;//=new MultipleTree();
         public override void OnGameStart()
         {
             //TODO: inicjalizacja, wczytywanie wyuczonego drzewka?
             tree = new MultipleTree();
-            tree.mePlayer = me;
-            tree.ReadTree(filename);
+            //tree.mePlayer = me;
+            //tree.ReadTree(filename);
 
         }
 
         public override void OnGameEnd()
         {
             //TODO: zapis wyuczonego drzewka?
-            tree.SaveTree(filename);
+            //tree.SaveTree(filename);
         }
 
         public override Move GetMove(GameState gameState)
