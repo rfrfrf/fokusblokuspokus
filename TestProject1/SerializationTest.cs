@@ -65,10 +65,7 @@ namespace TestProject1
         [TestMethod]
         public void MoveTest()
         {
-            var move = new Move();
-            move.Piece = Pieces.Pentamino05;
-            move.Position = new PiecePosition(6, 7);
-            move.VariantNumber = 3;
+            var move = new Move( Pieces.Pentamino05, new PiecePosition(6, 7), 3);
             var ms = new MemoryStream();
             BinaryFormatter bf = new BinaryFormatter();
             bf.Serialize(ms, move);
@@ -77,10 +74,7 @@ namespace TestProject1
             Assert.AreEqual(move, actual);
 
 
-            move = new Move();
-            move.Piece = Pieces.Tetramino05;
-            move.Position = new PiecePosition(9, 0);
-            move.VariantNumber = 1;
+            move = new Move( Pieces.Tetramino05, new PiecePosition(9, 0),1);
             ms = new MemoryStream();
             bf = new BinaryFormatter();
             bf.Serialize(ms, move);
@@ -99,10 +93,7 @@ namespace TestProject1
 
 
             move = new Move(1);
-            actual = new Move();
-            actual.Piece = Pieces.Monomino01;
-            actual.Position = new PiecePosition(0, 0);
-            actual.VariantNumber = 0;
+            actual = new Move(Pieces.Monomino01,new PiecePosition(0, 0), 0);
             Assert.AreEqual(move, actual);
 
 
