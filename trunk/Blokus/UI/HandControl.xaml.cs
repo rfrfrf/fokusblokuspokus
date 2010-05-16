@@ -143,12 +143,8 @@ namespace Blokus.UI
             {
                 if (_VariantNumber < piece.Variants.Count())
                 {
-                    board.PlacePiece(new Move()
-                    {
-                        Position = new PiecePosition(x * PieceSizeX, y * PieceSizeY),
-                        VariantNumber = _VariantNumber,
-                        Piece = piece
-                    }, HandOwner);
+                    board.PlacePiece(new Move(piece, new PiecePosition(x * PieceSizeX, y * PieceSizeY), _VariantNumber)
+                        ,HandOwner);
                 }
                 x++;
                 if (x >= PieceCountX)
