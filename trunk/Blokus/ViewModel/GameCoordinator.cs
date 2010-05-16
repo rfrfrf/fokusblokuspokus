@@ -22,8 +22,19 @@ namespace Blokus.ViewModel
         private int _CurrentVariantNumber;
         private Piece _CurrentPiece;
         private int _playedGames = 0;
-
+        private int _orangeWins = 0;
+        
         #region Properties
+        
+        public int OrangeWins
+        {
+            get { return _orangeWins; }
+            set
+            {
+                _orangeWins = value;
+                NotifyPropertyChanged("OrangeWins");
+            }
+        }
 
         public int PlayedGames
         {
@@ -300,6 +311,10 @@ namespace Blokus.ViewModel
             {
                 if (MakeMove(false))
                 {
+                    if (GameRules.GetWinner(GameState) == Player.Orange)
+                    {
+                        OrangeWins++;
+                    }
                     IsVioletWinner = false;
                     IsOrangeWinner = false;
                     GameState = new GameState();

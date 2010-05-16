@@ -30,8 +30,8 @@
     
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="25"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="35"/>
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -96,10 +96,12 @@
                     </Style>
                 </Button.Style>
             </Button>
-            <StackPanel Grid.Column="2" Orientation="Horizontal">
+            <WrapPanel Grid.Column="2" Orientation="Horizontal">
                 <TextBlock Text="Rozegrane partie: "/>            
                 <TextBlock Text="{Binding Path=PlayedGames}" />
-            </StackPanel>
+                <TextBlock Text="Wygrane pom.: "/>
+                <TextBlock Text="{Binding Path=OrangeWins}" />
+            </WrapPanel>
         </Grid>        
         <ComboBox 
             Grid.Row="1"
