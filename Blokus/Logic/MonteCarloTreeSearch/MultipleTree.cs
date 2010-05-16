@@ -14,6 +14,7 @@ namespace Blokus.Logic.MonteCarloTreeSearch
         private const double Wvalue = 100;
         private static Random r = new Random();
         private static MultipleTreeNode root = null;
+        Heuristics heuristic = new AlphaBeta.AlphaBetaHeuristics();
 
         private Player mePlayer;
 
@@ -128,9 +129,9 @@ namespace Blokus.Logic.MonteCarloTreeSearch
                 {
                     MovesCountWhenOpponentBlocked = prevMoves.Count;
                 }
-                GameState pomgs2 = PrepareGameState(currentNode);
-                pomgs2.SwapCurrentPlayer();
-                List<Move> someMoves2 = GameRules.GetMoves(pomgs2);
+                //GameState pomgs2 = PrepareGameState(currentNode);
+                //pomgs2.SwapCurrentPlayer();
+                //List<Move> someMoves2 = GameRules.GetMoves(pomgs2);
             }
             
             
@@ -140,21 +141,22 @@ namespace Blokus.Logic.MonteCarloTreeSearch
 
             //w tym miejscu currentNode na właściwym miejscu
 
-            
-           
+
+            int pomchildrencount = currentNode.childrenList.Count;
             this.mePlayer = gs.CurrentPlayerColor;
             MultipleTreeNode pomNode;
             double pomval;
             SelectNodeFromSubTree(currentNode, out pomNode, out pomval, gs);
             int res = Playout(pomNode);
             Backpropagate(res, pomNode);
+            
 
             Move resMove = null;
             if (currentNode.childrenList.Count > 0)
             {
 
                 //currentNode.childrenList.Sort(new Comparison<MultipleTreeNode>(delegate(MultipleTreeNode e, MultipleTreeNode k) { return e.victoryCount - k.victoryCount; }));
-                currentNode.childrenList.Sort((a, b) => { return a.victoryCount - b.victoryCount; });
+                currentNode.childrenList.Sort((a, b) => { return b.victoryCount - a.victoryCount; });
 
                 currentNode = currentNode.childrenList.ElementAt(0);
                 resMove = currentNode.move;
@@ -164,6 +166,8 @@ namespace Blokus.Logic.MonteCarloTreeSearch
 
             if (resMove != null && !allavMoves.Exists(e => e.Equals(resMove)))
             {
+                int a = 0;
+                a++;
 
                 throw new ArgumentException("zły ruch");
             }
@@ -249,7 +253,7 @@ namespace Blokus.Logic.MonteCarloTreeSearch
                 
                 foreach (Move m in moves)
                 {
-                    if (node.childrenList!=null && (pomNode = node.childrenList.Find(e => e.move == m)) != null)
+                    if (node.childrenList!=null && (pomNode = node.childrenList.Find(e => e.move.Equals(m))) != null)
                     {
                         pomformval = CountNode(pomNode);
                         if (globalMaxForm < pomformval)
@@ -279,7 +283,11 @@ namespace Blokus.Logic.MonteCarloTreeSearch
 
             if (isGlobalMaxFromTree)
             {
-                SelectNode(node.childrenList.Find(e => e.move == globalMaxMove), out maxNode, out maxNodeFormula, gs);
+                gs.AddMove(globalMaxMove);
+                gs.SwapCurrentPlayer();
+                SelectNode(node.childrenList.Find(e => e.move.Equals(globalMaxMove)), out maxNode, out maxNodeFormula, gs);
+                gs.SwapCurrentPlayer();
+                gs.DelMove(globalMaxMove);
             }
             else
             {
@@ -314,7 +322,7 @@ namespace Blokus.Logic.MonteCarloTreeSearch
             //}
         }
 
-        Heuristics heuristic = new AlphaBeta.AlphaBetaHeuristics();
+        
 
         public int Playout(MultipleTreeNode nnode)
         {
