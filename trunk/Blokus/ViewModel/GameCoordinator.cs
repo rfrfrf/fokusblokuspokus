@@ -304,6 +304,10 @@ namespace Blokus.ViewModel
                     IsOrangeWinner = false;
                     GameState = new GameState();
                     PlayedGames++;
+                    OrangePlayer.OnGameEnd();
+                    VioletPlayer.OnGameEnd();
+                    OrangePlayer.OnGameStart();
+                    VioletPlayer.OnGameStart();
                 }
             }
         }
