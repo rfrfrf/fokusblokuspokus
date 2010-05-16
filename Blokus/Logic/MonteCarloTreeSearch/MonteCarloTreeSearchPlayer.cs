@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Blokus.Logic.AlphaBeta;
 
 namespace Blokus.Logic.MonteCarloTreeSearch
 {
@@ -10,6 +11,20 @@ namespace Blokus.Logic.MonteCarloTreeSearch
         public const string filename = "tree.dat";
         //Player me;
         public MultipleTree tree;//=new MultipleTree();
+        public static AlphaBetaPlayer player = new AlphaBetaPlayer();
+
+        public int MaxDepth
+        {
+            get { return player.MaxDepth; }
+            set { player.MaxDepth = value; }
+        }
+
+        public int MaxTreeRank
+        {
+            get { return player.MaxTreeRank; }
+            set { player.MaxTreeRank = value; }
+        }
+
         public override void OnGameStart()
         {
             //TODO: inicjalizacja, wczytywanie wyuczonego drzewka?

@@ -314,20 +314,24 @@ namespace Blokus.Logic.MonteCarloTreeSearch
             //}
         }
 
+        Heuristics heuristic = new AlphaBeta.AlphaBetaHeuristics();
+
         public int Playout(MultipleTreeNode nnode)
         {
             GameState gs = PrepareGameState(nnode);
             //bool myMove = gs.CurrentPlayerColor == mePlayer;
             int block_counter=0;//sprawdzenie, czy obaj gracze nie mogą wykonywać już ruchów
-            var heuristic = new AlphaBeta.AlphaBetaHeuristics();
+            
             while (block_counter < 2)
             {
                 heuristic.SortHand(gs);
-                List<Move> moves = GameRules.GetMoves(gs, r.Next(888) + 2); //uzycie randa promuje ruchy z poczatku listy
+                List<Move> moves = GameRules.GetMoves(gs, 2+(int)(Math.Pow(r.NextDouble(), 2.0) * 1666)); //uzycie randa promuje ruchy z poczatku listy
                 if (moves.Count > 0)
                 {
                     heuristic.SortMoves(gs, moves);
-                    Move m = moves.ElementAt(r.Next(r.Next(moves.Count+1))); //uzycie 2 randow promuje ruchy z poczatku
+
+                    var m = GetBestMove(gs, moves);
+                    
                     gs.AddMove(m);
                     block_counter=0;
                 }
@@ -339,6 +343,34 @@ namespace Blokus.Logic.MonteCarloTreeSearch
             }
             return GameRules.GetWinner(gs) == mePlayer ? 1 : 0;
             
+        }
+
+        /// <summary>
+        /// wybiera 4 losowe ruchy mniej wiecej z poczatku listy moves a nastepnie wybiera z tych 4 ten, co daje 
+        /// najgorsza ocene planszy przeciwinkowi
+        /// </summary>
+        private Move GetBestMove(GameState gs, List<Move> moves)
+        {
+            int[] indices = new int[4];
+            double maxeval = double.NegativeInfinity;
+            int maxi = 0;
+            for (int i = 0; i < indices.Length; i++)
+            {
+                indices[i] = Math.Min(moves.Count - 1, 10 + 2 * (int)(Math.Pow(r.NextDouble(), 2.0) * moves.Count));
+            }
+            for (int i = 0; i < indices.Length; i++)
+            {
+                double eval;
+                gs.AddMove(moves[indices[i]]);
+                eval = -heuristic.GetBoardEvaluation(gs);
+                if (eval > maxeval)
+                {
+                    maxeval = eval;
+                    maxi = i;
+                }
+                gs.DelMove(moves[indices[i]]);
+            }
+            return moves.ElementAt(maxi);
         }
 
         public void Backpropagate(int result, MultipleTreeNode node)
@@ -368,7 +400,7 @@ namespace Blokus.Logic.MonteCarloTreeSearch
             //else
             //{
             //    return node.victoryCount;
-            //}
+            //}                        
             return r.NextDouble() * (node.victoryCount+1.0) / (node.visitCount+10.0); 
             //ocena 0.1 dla nieodweidzonych, 1.0 dla liczby zwyciestw dazaczecj do nieskonczonosci
         }
