@@ -102,6 +102,7 @@
     <Compile Include="Logic\AlphaBeta\AlphaBetaPlayer.cs" />
     <Compile Include="Logic\Board.cs" />
     <Compile Include="Logic\Heuristics.cs" />
+    <Compile Include="Logic\MCTS\MCSTHeuristics.cs" />
     <Compile Include="Logic\MCTS\MCSTPlayer.cs" />
     <Compile Include="Logic\MonteCarloTreeSearch\MonteCarloTreeSearchPlayer.cs" />
     <Compile Include="Logic\MonteCarloTreeSearch\MultipleTree.cs" />
