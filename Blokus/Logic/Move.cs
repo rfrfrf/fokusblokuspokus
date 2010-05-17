@@ -48,7 +48,7 @@ namespace Blokus.Logic
         public override bool Equals(object obj)
         {
             Move move = obj as Move;
-            if (move == null)
+            if ( null == (object)move)
             {
                 return false;
             }
@@ -58,6 +58,24 @@ namespace Blokus.Logic
         public override int GetHashCode()
         {
             return _SerializedMove;
+        }
+
+        public static bool operator ==(Move obj, object obj2)
+        {
+            if (null == (object)obj2)
+            {
+                return null == (object)obj;
+            }
+            return obj2.Equals(obj);
+        }
+
+        public static bool operator !=(Move obj, object obj2)
+        {
+            if (null == (object)obj2)
+            {
+                return null != (object)obj;
+            }
+            return !obj2.Equals(obj);
         }
 
      //   public Move() { }

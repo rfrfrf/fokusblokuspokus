@@ -196,13 +196,13 @@ namespace Blokus.ViewModel
                 IsOrangeWinner = false;
                 GameState = new GameState();
                 RefreshUI();
-                OrangePlayer.OnGameStart();
-                VioletPlayer.OnGameStart();
+                OrangePlayer.OnGameStart(GameState);
+                VioletPlayer.OnGameStart(GameState);
                 StartGameWorker();
             }
             else
             {
-                CurrentPlayer.CancelMove();
+                CurrentPlayer.CancelMove(GameState);
                 _Worker.CancelAsync();
             }
         }
@@ -215,13 +215,13 @@ namespace Blokus.ViewModel
                 IsOrangeWinner = false;
                 GameState = new GameState();
                 RefreshUI();
-                OrangePlayer.OnGameStart();
-                VioletPlayer.OnGameStart();
+                OrangePlayer.OnGameStart(GameState);
+                VioletPlayer.OnGameStart(GameState);
                 StartGameTrainer();
             }
             else
             {
-                CurrentPlayer.CancelMove();
+                CurrentPlayer.CancelMove(GameState);
                 _Worker.CancelAsync();
             }
         }
@@ -296,8 +296,8 @@ namespace Blokus.ViewModel
         private void GameWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             NotifyPropertyChanged("IsGameInProgress");
-            OrangePlayer.OnGameEnd();
-            VioletPlayer.OnGameEnd();
+            OrangePlayer.OnGameEnd(GameState);
+            VioletPlayer.OnGameEnd(GameState);
             ShowGameResult();
             if (e.Error != null)
             {
@@ -317,12 +317,12 @@ namespace Blokus.ViewModel
                     }
                     IsVioletWinner = false;
                     IsOrangeWinner = false;
+                    OrangePlayer.OnGameEnd(GameState);
+                    VioletPlayer.OnGameEnd(GameState);
                     GameState = new GameState();
+                    OrangePlayer.OnGameStart(GameState);
+                    VioletPlayer.OnGameStart(GameState);
                     PlayedGames++;
-                    OrangePlayer.OnGameEnd();
-                    VioletPlayer.OnGameEnd();
-                    OrangePlayer.OnGameStart();
-                    VioletPlayer.OnGameStart();
                 }
             }
         }

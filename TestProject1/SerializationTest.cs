@@ -130,7 +130,33 @@ namespace TestProject1
             for (int i = 0; i < actualsList.Count; i++)
             {
                 Assert.AreEqual(movesList[i], actualsList[i]);
-            }   
+            }
+
+            Assert.AreEqual(new Move(3), new Move(3));
+            Assert.AreEqual(new Move(Pieces.Pentamino06, new PiecePosition(6, 7), 1), new Move(Pieces.Pentamino06, new PiecePosition(6, 7), 1));
+            Assert.AreNotEqual(new Move(3), new Move(2));
+
+            Assert.IsTrue(new Move(3) == new Move(3));
+            Assert.IsTrue(new Move(Pieces.Pentamino06, new PiecePosition(6, 7), 1) == new Move(Pieces.Pentamino06, new PiecePosition(6, 7), 1));
+            Assert.IsFalse(new Move(4) == new Move(3));
+            Assert.IsFalse(new Move(Pieces.Pentamino06, new PiecePosition(7, 6), 1) == new Move(Pieces.Pentamino06, new PiecePosition(6, 7), 1));
+
+            Assert.IsFalse(new Move(3) != new Move(3));
+            Assert.IsFalse(new Move(Pieces.Pentamino06, new PiecePosition(6, 7), 1) != new Move(Pieces.Pentamino06, new PiecePosition(6, 7), 1));
+            Assert.IsTrue(new Move(4) != new Move(3));
+            Assert.IsTrue(new Move(Pieces.Pentamino06, new PiecePosition(7, 6), 1) != new Move(Pieces.Pentamino06, new PiecePosition(6, 7), 1));
+
+            Assert.IsTrue(new Move(3) != null);
+            Assert.IsTrue(null != new Move(3));
+            Move movenull = null;
+            Assert.IsFalse(movenull != null);
+            Assert.IsFalse(null != movenull);
+            Assert.IsTrue(movenull == null);
+            Assert.IsTrue(null == movenull);
+            Assert.AreNotEqual(movenull, new Move(1));
+            Assert.AreEqual(movenull, null);
+            Assert.AreNotEqual(new Move(1), movenull);
+            Assert.AreEqual(null, movenull);
         }
     }
 }

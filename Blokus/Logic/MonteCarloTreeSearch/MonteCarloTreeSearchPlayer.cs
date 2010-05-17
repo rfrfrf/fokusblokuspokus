@@ -25,7 +25,7 @@ namespace Blokus.Logic.MonteCarloTreeSearch
             set { player.MaxTreeRank = value; }
         }
 
-        public override void OnGameStart()
+        public override void OnGameStart(GameState gameState)
         {
             //TODO: inicjalizacja, wczytywanie wyuczonego drzewka?
             tree = new MultipleTree();
@@ -34,7 +34,7 @@ namespace Blokus.Logic.MonteCarloTreeSearch
 
         }
 
-        public override void OnGameEnd()
+        public override void OnGameEnd(GameState gameState)
         {
             //TODO: zapis wyuczonego drzewka?
             //tree.SaveTree(filename);
