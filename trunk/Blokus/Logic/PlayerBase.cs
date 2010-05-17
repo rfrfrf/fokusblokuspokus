@@ -9,8 +9,8 @@ namespace Blokus.Logic
     public abstract class PlayerBase
     {
         public abstract Move GetMove(GameState gameState);
-        public abstract void OnGameStart();
-        public abstract void OnGameEnd();
-        public abstract void CancelMove();
+        public abstract void OnGameStart(GameState gameState);
+        public abstract void OnGameEnd(GameState gameState);
+        public abstract void CancelMove(GameState gameState);
     }
 }

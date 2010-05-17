@@ -26,18 +26,18 @@ namespace Blokus.Logic
             return _LastMove;
         }
 
-        public override void CancelMove()
+        public override void CancelMove(GameState gameState)
         {
             _LastMove = null;
             MoveSemaphore.Release();
         }
 
-        public override void OnGameStart() 
+        public override void OnGameStart(GameState gameState) 
         {
             MoveSemaphore = new Semaphore(0, 1);
         }
 
-        public override void OnGameEnd() { }
+        public override void OnGameEnd(GameState gameState) { }
 
         #endregion
 

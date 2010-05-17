@@ -338,9 +338,10 @@ namespace Blokus.Logic.MonteCarloTreeSearch
                 {
                     heuristic.SortMoves(gs, moves);
 
-                    var m = GetBestMove(gs, moves);
-                    
-                    gs.AddMove(m);
+                 //   var m = GetBestMove(gs, moves);
+                    int index = Math.Min(moves.Count - 1, 10 + 2 * (int)(Math.Pow(r.NextDouble(), 2.0) * moves.Count)); 
+
+                    gs.AddMove(moves[index]);
                     block_counter=0;
                 }
                 else
@@ -359,7 +360,7 @@ namespace Blokus.Logic.MonteCarloTreeSearch
         /// </summary>
         private Move GetBestMove(GameState gs, List<Move> moves)
         {
-            int[] indices = new int[4];
+            int[] indices = new int[2];
             double maxeval = double.NegativeInfinity;
             int maxi = 0;
             for (int i = 0; i < indices.Length; i++)
@@ -370,12 +371,14 @@ namespace Blokus.Logic.MonteCarloTreeSearch
             {
                 double eval;
                 gs.AddMove(moves[indices[i]]);
+                gs.SwapCurrentPlayer();
                 eval = -heuristic.GetBoardEvaluation(gs);
                 if (eval > maxeval)
                 {
                     maxeval = eval;
                     maxi = i;
                 }
+                gs.SwapCurrentPlayer();
                 gs.DelMove(moves[indices[i]]);
             }
             return moves.ElementAt(maxi);

@@ -15,11 +15,11 @@ namespace Blokus.Logic
             return null;
         }
 
-        public override void OnGameStart() {}
+        public override void OnGameStart(GameState gameState) { }
 
-        public override void OnGameEnd() { }
+        public override void OnGameEnd(GameState gameState) { }
 
-        public override void CancelMove() { }        
+        public override void CancelMove(GameState gameState) { }        
 
         #endregion //PlayerBase Members
     }
