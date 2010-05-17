@@ -285,6 +285,7 @@ namespace Blokus.ViewModel
         private void StartGameTrainer()
         {
             PlayedGames = 0;
+            OrangeWins = 0;
             _Worker = new BackgroundWorker();
             _Worker.WorkerSupportsCancellation = true;
             _Worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(GameWorkerCompleted);

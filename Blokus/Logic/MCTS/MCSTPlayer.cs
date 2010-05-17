@@ -13,7 +13,7 @@ namespace Blokus.Logic.MCTS
         public Dictionary<int, Node> Children;
         public Node Parent;
         
-        public bool IsLeaf { get { return Children != null && Children.Count > 0; } }
+        public bool IsLeaf { get { return Children == null || Children.Count == 0; } }
 
 
         public Node this[int i]
@@ -53,7 +53,7 @@ namespace Blokus.Logic.MCTS
         }
 
         private Move _LastMove;
-        private Heuristics _Heursitics = new AlphaBetaHeuristics();
+        private Heuristics _Heursitics = new MCSTHeuristics();
 
         public override void OnGameStart(GameState gameState)
         {
@@ -62,17 +62,29 @@ namespace Blokus.Logic.MCTS
 
         public override Move GetMove(GameState gameState)
         {
-            if (gameState.AllMoves.Count > 0)
+            if (gameState.AllMoves.Count > 0) // posun currentNode o ruch przeciwnika
             {
                 if (currentNode != null)
                 {
+                    var parent = currentNode;
                     currentNode = currentNode[gameState.AllMoves[gameState.AllMoves.Count - 1].SerializedMove];
+                    if (currentNode == null) //dodaj do drzewa ruch przeciwnika
+                    {
+                        var lastMove = gameState.AllMoves[gameState.AllMoves.Count-1];
+                        var node= new Node()
+                        { 
+                            Children = new Dictionary<int,Node>(),
+                            Parent = parent
+                        };
+                        parent.Children.Add(lastMove.SerializedMove, node);
+                            
+                    }
                 }
             }
             myColor = gameState.CurrentPlayerColor;
             _LastMove = null;
             Mcst(gameState, currentNode);
-            if (currentNode != null)
+            if (currentNode != null && _LastMove != null) // posun currentNode o nas ruch
             {
                 currentNode = currentNode[_LastMove.SerializedMove];
             }
@@ -106,6 +118,12 @@ namespace Blokus.Logic.MCTS
                 return GameRules.GetGameResult(gameState); // pozycja koncowa
             }
 
+            if (node != null && !node.IsLeaf)
+            {
+                var nodeChildren = from c in node.Children select new Move(c.Key);
+                moves.AddRange(nodeChildren);
+            }
+
             _Heursitics.SortMoves(gameState, moves); //posortuj ruchy by najlepsze byly na poczatku
 
             Move bestMove = null;
@@ -135,14 +153,6 @@ namespace Blokus.Logic.MCTS
 
                 node.Children.Add(bestMove.SerializedMove, newNode);                
             }
-       /*     //wczuj sie w przeciwnika
-            gameState.AddMove(bestMove); //poloz na planszy klocek
-            gameState.SwapCurrentPlayer(); //zmien aktywnego gracza na przeciwnego
-            //znajdz ruch przeciwnka
-            double result = -Mcst(gameState, child);
-            //posprzataj
-            gameState.SwapCurrentPlayer(); //przywroc aktywnego gracza                 
-            gameState.DelMove(bestMove); //zdejmij klocek z planszy*/
 
             _LastMove = bestMove;
             return 0;
@@ -151,17 +161,21 @@ namespace Blokus.Logic.MCTS
         private double EvaluateMove(Move move, GameState gameState, Node node)
         {
             Node child;
+            double result;
             if (node != null && (child = node[move.SerializedMove]) != null)
             {
-                return (node.WinCount + 0.001) / (node.VisitCount + 1.0);
+                result = -(node.VisitCount - node.WinCount + 0.003) / (node.VisitCount + 10.0);
             }
-            double result;
-            gameState.AddMove(move);
-            gameState.SwapCurrentPlayer();
-            result = -_Heursitics.GetBoardEvaluation(gameState);
-            gameState.SwapCurrentPlayer();
-            gameState.DelMove(move);
-            return result;
+            else
+            {
+                gameState.AddMove(move);
+                gameState.SwapCurrentPlayer();
+                result = -_Heursitics.GetBoardEvaluation(gameState);
+                gameState.SwapCurrentPlayer();
+                gameState.DelMove(move);
+            }
+            result += 1;
+            return random.NextDouble() * result;
         }
 
         public override string ToString()
