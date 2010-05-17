@@ -8,6 +8,8 @@ using System.ComponentModel;
 using System.Threading;
 using Blokus.UI;
 using System.Windows;
+using Blokus.Logic.MCTS;
+using Blokus.Logic.Scout;
 
 namespace Blokus.ViewModel
 {

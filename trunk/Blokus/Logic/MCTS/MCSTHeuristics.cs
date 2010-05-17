@@ -11,7 +11,7 @@ namespace Blokus.Logic.MCTS
 
         public override double GetBoardEvaluation(GameState gameState)
         {
-            return GameRules.GetMoves(gameState).Count*0.0001;
+            return GameRules.GetMoves(gameState).Count*0.001;
         }
 
         /// <summary>

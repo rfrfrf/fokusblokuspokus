@@ -22,8 +22,8 @@ namespace Blokus.Logic.AlphaBeta
             (* Initial call *)
             alphabeta(origin, depth, -infinity, +infinity)
          */
-        private int _MaxDepth = 2;
-        private int _MaxTreeRank = 666;
+        private int _MaxDepth = 1;
+        private int _MaxTreeRank = 1;
 
         public int MaxDepth
         {
