@@ -27,7 +27,12 @@ namespace Blokus.ViewModel
         private int _orangeWins = 0;
         
         #region Properties
-        
+
+        public double OrangePercentageWins
+        {
+            get { return PlayedGames==0? 0: OrangeWins / ((double)PlayedGames); }
+        }
+
         public int OrangeWins
         {
             get { return _orangeWins; }
@@ -326,6 +331,7 @@ namespace Blokus.ViewModel
                     OrangePlayer.OnGameStart(GameState);
                     VioletPlayer.OnGameStart(GameState);
                     PlayedGames++;
+                    NotifyPropertyChanged("OrangePercentageWins");
                 }
             }
         }

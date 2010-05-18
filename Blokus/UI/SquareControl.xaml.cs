@@ -21,6 +21,7 @@ namespace Blokus.UI
     /// </summary>
     public partial class SquareControl : UserControl
     {
+        private static Brush background = (Brush)new BrushConverter().ConvertFrom("#60693ba7");
         #region DependencyProperty
         public Board Board
         {
@@ -47,7 +48,7 @@ namespace Blokus.UI
                 case Player.Violet : brush = Brushes.Violet; break;
              /*   case Player.HighlightedOrange: brush = Brushes.Yellow; break;
                 case Player.HighlightedViolet: brush = Brushes.Lavender; break;*/
-                default: brush = Brushes.Gray; break;
+                default: brush = background; break;
             }
             squareControl.MainButton.Background = brush;
         }

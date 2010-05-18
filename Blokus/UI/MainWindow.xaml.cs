@@ -65,5 +65,15 @@ namespace Blokus.UI
             //MultipleTree.SaveTree(MonteCarloTreeSearchPlayer.filename);
             MCSTPlayer.SaveTree(filename);
         }
+
+        private void ComboBox_Loaded(object sender, RoutedEventArgs e)
+        {
+            ((ComboBox)sender).SelectedIndex = 3;
+        }
+
+        private void ComboBox_Loaded_1(object sender, RoutedEventArgs e)
+        {
+            ((ComboBox)sender).SelectedIndex = 2;
+        }
     }
 }

@@ -3,8 +3,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Button Width="30" Height="30"
         x:Name="MainButton" 
-        Background="Gray"
-        BorderBrush="DarkGray" 
+        Background="#60693ba7"
+        BorderBrush="#8010405f" 
         BorderThickness="1" 
         SnapsToDevicePixels="True"
         >

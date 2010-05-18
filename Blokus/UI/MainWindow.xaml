@@ -10,32 +10,59 @@
     xmlns:logicMcts="clr-namespace:Blokus.Logic.MCTS"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     Title="Blokus Duo" 
-        Closing="Window_Closing"
-
-        MouseWheel="Window_MouseWheel" Height="516" Width="657">
-    
+    Closing="Window_Closing"
+    MouseWheel="Window_MouseWheel" 
+    Height="602" Width="729"    
+    Background="#162640"
+    >
     <Window.Resources>
         <x:Array Type="{x:Type logic:PlayerBase}" x:Key="orangePlayersDataSource">
             <logic:HumanPlayer />
             <logicAlphaBeta:AlphaBetaPlayer />
             <logicScout:ScoutPlayer />
-            <logicMonte:MonteCarloTreeSearchPlayer />
+            <!--<logicMonte:MonteCarloTreeSearchPlayer />-->
             <logicMcts:MCSTPlayer />
         </x:Array>
         <x:Array Type="{x:Type logic:PlayerBase}" x:Key="violetPlayersDataSource">
             <logic:HumanPlayer />
             <logicAlphaBeta:AlphaBetaPlayer />
             <logicScout:ScoutPlayer />
-            <logicMonte:MonteCarloTreeSearchPlayer />
+            <!--<logicMonte:MonteCarloTreeSearchPlayer />-->
             <logicMcts:MCSTPlayer />
         </x:Array>
-    </Window.Resources>
-    
+        <Style TargetType="{x:Type TextBlock}" >
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Margin" Value="2" />
+        </Style>
+        <Style TargetType="{x:Type Expander}" >
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        <Style TargetType="{x:Type ComboBox}">
+            <Setter Property="Background" Value="#10405f" />
+            <Setter Property="ItemsPanel">
+                <Setter.Value>
+                    <ItemsPanelTemplate>
+                        <StackPanel Background="#10405f"/>
+                    </ItemsPanelTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="{x:Type ListBox}">
+            <Setter Property="Background" Value="#10405f" />
+        </Style>
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="#10405f" />
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+    </Window.Resources>    
     <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="http://www.actuate.com/images/int/chrome/bg.jpg" Stretch="UniformToFill"  />
+        </Grid.Background>
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="35"/>
-            <RowDefinition/>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="28"/>
+            <RowDefinition Height="350"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -44,28 +71,74 @@
             <ColumnDefinition Width="130"/>
         </Grid.ColumnDefinitions>
         <TextBlock 
+            FontWeight="Bold"
+            Text="Gracz pomarańczowy" 
+            Foreground="Orange"
+            HorizontalAlignment="Center" VerticalAlignment="Center">
+             <TextBlock.Style>
+                <Style>
+                    <Style.Triggers>
+                        <DataTrigger 
+                                Binding="{Binding Path=IsOrangeWinner}" 
+                                Value="true">
+                            <Setter Property="TextBlock.BitmapEffect">
+                                <Setter.Value>
+                                    <OuterGlowBitmapEffect GlowColor="#12a170" GlowSize="6" />
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+        <TextBlock 
+            FontWeight="Bold"
+            Grid.Column="2"
+            Foreground="Violet"
+            Text="Gracz fioletowy" 
+            HorizontalAlignment="Center" VerticalAlignment="Center"
+            >
+            <TextBlock.Style>
+                <Style>
+                    <Style.Triggers>
+                        <DataTrigger 
+                                Binding="{Binding Path=IsVioletWinner}" 
+                                Value="true">
+                            <Setter Property="TextBlock.BitmapEffect">
+                                <Setter.Value>
+                                    <OuterGlowBitmapEffect GlowColor="#12a170" GlowSize="6" />
+                                </Setter.Value>
+                            </Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+        <TextBlock 
             Grid.Column="1"
             FontSize="22" 
             FontFamily="Arial Black" 
             HorizontalAlignment="Center" 
             VerticalAlignment="Center"
-            Foreground="Pink">
+            Foreground="#9274dd">
             Blokus Duo
         </TextBlock>
-        <ComboBox 
+        <ComboBox                    
+            Margin="2"
             Grid.Row="1"
             ItemsSource="{Binding Source={StaticResource orangePlayersDataSource}}" 
-            SelectedValue="{Binding OrangePlayer}"
-            />
+            SelectedValue="{Binding OrangePlayer}" Loaded="ComboBox_Loaded" />
         <Grid                 
             Grid.Row="1"
             Grid.Column="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
-                <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <Button 
+                ToolTip="Rozgrywa jedną partię między pomarańczowym a fioletowym graczem"
+                Margin="2"
+                Width="100"
                 x:Name="NewGameButton"
                 Command="{Binding Path=NewGameCommand}" 
                 >
@@ -83,6 +156,9 @@
                 </Button.Style>            
             </Button>
             <Button 
+                ToolTip="Rozgrywa wiele partii między pomarańczowym a fioletowym graczem"
+                Margin="2"
+                Width="100"
                 Grid.Column="1"
                 Command="{Binding Path=TrainCommand}" 
                 >
@@ -99,25 +175,22 @@
                     </Style>
                 </Button.Style>
             </Button>
-            <WrapPanel Grid.Column="2" Orientation="Horizontal">
-                <TextBlock Text="Rozegrane partie: "/>            
-                <TextBlock Text="{Binding Path=PlayedGames}" />
-                <TextBlock Text="Wygrane pom.: "/>
-                <TextBlock Text="{Binding Path=OrangeWins}" />
-            </WrapPanel>
         </Grid>        
         <ComboBox 
+            SelectedIndex="2"
+            Margin="2"
             Grid.Row="1"
             Grid.Column="2"
             ItemsSource="{Binding Source={StaticResource violetPlayersDataSource}}" 
-            SelectedValue="{Binding VioletPlayer}"
-            />
+            SelectedValue="{Binding VioletPlayer}" Loaded="ComboBox_Loaded_1" />
         <Border
             Grid.Row="2" 
-            BorderBrush="Green"
+            BorderBrush="LimeGreen"
+            CornerRadius="8"
             >
             <Border                 
-                BorderBrush="Red"
+                BorderBrush="Purple"
+                CornerRadius="5"
                 >
                 <usr:HandControl             
                     Hand="{Binding Path=OrangeHand}"
@@ -144,7 +217,7 @@
                         <DataTrigger 
                                 Binding="{Binding Path=IsOrangeWinner}" 
                                 Value="true">
-                            <Setter Property="Border.BorderThickness" Value="3"/>
+                            <Setter Property="Border.BorderThickness" Value="5"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
@@ -172,10 +245,12 @@
         <Border
             Grid.Row="2" 
             Grid.Column="2" 
-            BorderBrush="Green"
+            BorderBrush="LimeGreen"
+            CornerRadius="8"
             >
             <Border 
-                BorderBrush="Red"
+                BorderBrush="Purple"
+                CornerRadius="5"
                 >
                 <usr:HandControl 
                     Hand="{Binding Path=VioletHand}"
@@ -202,17 +277,34 @@
                         <DataTrigger 
                                 Binding="{Binding Path=IsVioletWinner}" 
                                 Value="true">
-                            <Setter Property="Border.BorderThickness" Value="3"/>
+                            <Setter Property="Border.BorderThickness" Value="5"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
             </Border.Style>
         </Border>
-        <Expander Header="Parametry" Grid.Row="3" IsExpanded="False">
-            <usr:TreeSearchParameters DataContext="{Binding OrangePlayer}" />
-        </Expander>
-        <Expander Header="Parametry" Grid.Row="3" Grid.Column="2" IsExpanded="False">
-            <usr:TreeSearchParameters DataContext="{Binding VioletPlayer}" />
-        </Expander>
+        <Grid Grid.ColumnSpan="3" Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Expander Header="Parametry"  IsExpanded="False">
+                <usr:TreeSearchParameters DataContext="{Binding OrangePlayer}" />
+            </Expander>
+            <Expander Header="Parametry" Grid.Column="2" >
+                <usr:TreeSearchParameters DataContext="{Binding VioletPlayer}" />
+            </Expander>
+            <Expander Grid.Column="1" Header="Statystyki treningu" IsExpanded="False">
+                <WrapPanel Orientation="Horizontal">
+                    <TextBlock Text="Rozegrane partie: "/>
+                    <TextBlock Text="{Binding Path=PlayedGames}" />
+                    <TextBlock Text="Wygrane pomarańczowego: "/>
+                    <TextBlock Text="{Binding Path=OrangeWins}" />
+                    <TextBlock Text="Procent wygranych: "/>
+                    <TextBlock Text="{Binding Path=OrangePercentageWins, StringFormat='{}{0:P2}'}" />
+                </WrapPanel>
+            </Expander>    
+        </Grid>
     </Grid>
 </Window>

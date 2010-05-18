@@ -125,7 +125,8 @@ namespace Blokus.Logic.MCTS
 
         public override void OnGameEnd(GameState gameState)
         {
-            int result = GameRules.GetWinner(gameState) == _MyColor ? 1 : 0;
+            int result = GameRules.GetWinner(gameState) == Player.Orange ? 1 : 0;
+
             var node = _Root;
 
             foreach (var move in gameState.AllMoves)
@@ -159,6 +160,11 @@ namespace Blokus.Logic.MCTS
                          }
                      }*/
             }
+            else //wyszlismy poza drzewo, zwroc ruch z innego algorytmu
+            {
+                _LastMove = _Playouter.GetMove(gameState);
+                return;
+            }
 
             moves = GameRules.GetMoves(gameState, MaxTreeRank); //pobierz MaxTreeRank pierwszych dostepnych ruchow
 
@@ -172,7 +178,7 @@ namespace Blokus.Logic.MCTS
                 moves.AddRange(nodeChildren);
             }
 
-            _Heursitics.SortMoves(gameState, moves); //posortuj ruchy by najlepsze byly na poczatku
+            //   _Heursitics.SortMoves(gameState, moves); //posortuj ruchy by najlepsze byly na poczatku
 
             Move bestMove = null;
             double maxEval = double.NegativeInfinity;
@@ -205,19 +211,28 @@ namespace Blokus.Logic.MCTS
             double result;
             if (node != null && (child = node[move.SerializedMove]) != null) //wierzcholek jest w drzewie, uzyj wiedzy o wincount
             {
-                result = (node.WinCount + 0.01) / (node.VisitCount + 0.1);
+                if (_MyColor == Player.Orange)
+                {
+                    result = (node.WinCount + 0.01) / (node.VisitCount + 0.1);
+                }
+                else
+                {
+                    result = ((node.VisitCount - node.WinCount) + 0.01) / (node.VisitCount + 0.1);
+                }
             }
             else // wierzcholka nie ma w drzewie, uzyj heurystycznej oceny
             {
                 gameState.AddMove(move);
                 gameState.SwapCurrentPlayer();
-                result = 0.8 - _Heursitics.GetBoardEvaluation(gameState);
+                result = 0.5 - _Heursitics.GetBoardEvaluation(gameState);
                 gameState.SwapCurrentPlayer();
                 gameState.DelMove(move);
             }
 
-            double add = _Random.NextDouble() * 0.3;
-            result += add * add;
+            double add = _Random.NextDouble();
+            add *= add;
+            add *= add;
+            result += add * add; //lekka nutka niedeterminizmu
 
             return result;
         }
@@ -249,7 +264,7 @@ namespace Blokus.Logic.MCTS
             catch (Exception)
             {
                 _Root = new Node();
-                MessageBox.Show("Nie udało się wczytać drzewa. Tworzę nowe");
+                MessageBox.Show("Nie udało się wczytać drzewa. Utworzono nowe.");
             }
 
         }
