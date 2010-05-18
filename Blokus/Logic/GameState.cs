@@ -14,6 +14,8 @@ namespace Blokus.Logic
         public Board Board { get; set; }
         public bool IsLastOrangeMoveMonomino { private set; get; }
         public bool IsLastVioletMoveMonomino { private set; get; }
+        public PlayerBase OrangePlayer { get; set; }
+        public PlayerBase VioletPlayer { get; set; }
 
         public List<Move> AllMoves { private set; get; }
 

@@ -64,6 +64,30 @@ namespace TestProject1
         #endregion
 
         [TestMethod]
+        public void RulesTest()
+        {
+            var gs = new GameState();
+            gs.AddMove(new Move(592129));
+            gs.SwapCurrentPlayer();
+            gs.AddMove(new Move(197634));
+            gs.SwapCurrentPlayer();
+            var dict = new Dictionary<int, Move>();
+            var moves = GameRules.GetMoves(gs);
+
+            foreach (var move in moves)
+            {
+                if (dict.ContainsKey(move.SerializedMove))
+                {
+                    int i = 2;
+                }
+                else
+                {
+                    dict.Add(move.SerializedMove, move);
+                }
+            }
+        }
+
+        [TestMethod]
         public void NodeTest()
         {
             var root = new Node();

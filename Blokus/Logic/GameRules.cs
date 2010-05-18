@@ -65,6 +65,8 @@ namespace Blokus.Logic
             bool isGameNew)
         {
             var result = new List<Move>();
+            var set = new HashSet<Move>();
+
             if (moveCount <= 0)
             {
                 return result;
@@ -98,7 +100,12 @@ namespace Blokus.Logic
                             }
                             if (isOk)
                             {
-                                result.Add(new Move(piece, piecePos, variant));
+                                var move = new Move(piece, piecePos, variant);
+                                if(!set.Contains(move))
+                                {
+                                    result.Add(move);
+                                    set.Add(move);
+                                }
                                 moveCount--;
                                 if (moveCount <= 0)
                                 {

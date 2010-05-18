@@ -66,6 +66,7 @@ namespace Blokus.Logic.MCTS
         private Player _MyColor;
         private Move _LastMove;
         private Heuristics _Heursitics = new MCSTHeuristics();
+        private bool _Training = false;
 
         public MCSTPlayer()
         {
@@ -90,10 +91,20 @@ namespace Blokus.Logic.MCTS
         public override void OnGameStart(GameState gameState)
         {
             _CurrentNode = _Root;
+            _Training = gameState.VioletPlayer is MCSTPlayer && gameState.OrangePlayer is MCSTPlayer;
         }
 
         public override Move GetMove(GameState gameState)
         {
+            if (_Training)
+            {
+                if (gameState.CurrentPlayerColor == Player.Orange)
+                {
+                    uctSearch(gameState, _Root);
+                }
+                return null;
+            }
+
             if (gameState.AllMoves.Count > 0) // posun currentNode o ruch przeciwnika
             {
                 if (_CurrentNode != null)
@@ -125,18 +136,21 @@ namespace Blokus.Logic.MCTS
 
         public override void OnGameEnd(GameState gameState)
         {
-            int result = GameRules.GetWinner(gameState) == Player.Orange ? 1 : 0;
-
-            var node = _Root;
-
-            foreach (var move in gameState.AllMoves)
+            if (!_Training)
             {
-                node.VisitCount++;
-                node.WinCount += result;
-                node = node[move.SerializedMove];
-                if (node == null)
+                int result = GameRules.GetWinner(gameState) == Player.Orange ? 1 : 0;
+
+                var node = _Root;
+
+                foreach (var move in gameState.AllMoves)
                 {
-                    break;
+                    node.VisitCount++;
+                    node.WinCount += result;
+                    node = node[move.SerializedMove];
+                    if (node == null)
+                    {
+                        break;
+                    }
                 }
             }
         }
@@ -236,6 +250,132 @@ namespace Blokus.Logic.MCTS
 
             return result;
         }
+
+        //tryb treningu - UCT
+
+        private double _C = 1.0;
+
+        private KeyValuePair<int, Node>? utcSelect(Node node)
+        {
+            var bestutc = 0.0;
+            KeyValuePair<int, Node>? bestnode = null;
+
+            foreach (var n in node.Children)
+            {
+                double utcvalue;
+                if (n.Value.VisitCount == 0)
+                {
+                    // play unvisited nodes first
+                    utcvalue = 10000 + _Random.Next(1000);
+                }
+                else
+                {
+                    double winrate = n.Value.WinCount / n.Value.VisitCount;
+                    double utc = _C * Math.Sqrt(Math.Log(node.VisitCount, Math.E) / n.Value.VisitCount);
+                    utcvalue = winrate + utc;
+                }
+                if (utcvalue > bestutc)
+                {
+                    bestutc = utcvalue;
+                    bestnode = n;
+
+                }
+            }
+            return bestnode;
+        }
+
+        private int playSimulation(GameState state, Node node)
+        {
+            int result = 0;
+            if (node.VisitCount == 0)
+            {
+                result = playrandomgame(state);
+            }
+            else
+            {
+                if (node.IsLeaf)
+                {
+                    var moves = GameRules.GetMoves(state);
+                    if (moves.Count == 0)
+                    {
+                        result = GameRules.GetWinner(state) == Player.Orange ? 1 : 0;
+                        node.VisitCount += 1;
+                        node.WinCount += result;
+
+                        return result;
+                    }
+                    foreach (var move in moves)
+                    {
+                        node.Children.Add(move.SerializedMove, new Node());
+                    }
+                }
+
+                var next = utcSelect(node);
+                state.AddMove(new Move(next.Value.Key));
+                state.SwapCurrentPlayer();
+                result = playSimulation(state, next.Value.Value);
+            }
+            node.VisitCount += 1;
+            node.WinCount += result;
+
+            return result;
+        }
+
+        private Move uctSearch(GameState state, Node root)
+        {
+
+            playSimulation(state, root);
+
+            return null;
+        }
+
+        private int playrandomgame(GameState state)
+        {
+            while (true)
+            {
+                var moves = GameRules.GetMoves(state);
+                if (moves.Count == 0)
+                {
+                    break;
+                }
+                var move = moves[_Random.Next(moves.Count)];
+                state.AddMove(move);
+                state.SwapCurrentPlayer();
+            }
+            return GameRules.GetWinner(state)==Player.Orange ? 1:0;
+        }
+
+
+           private double Select(Node root, out Node bestNode)
+           {
+               var ln = Math.Log10(root.VisitCount + 1.0);
+               var bestEval = double.NegativeInfinity;
+               bestNode = null;
+
+               foreach (var child in root.Children)
+               {
+                   var invN = 1.0 / (child.Value.VisitCount + 1.0);
+                   var eval = child.Value.WinCount * invN + _C * Math.Sqrt(ln*invN);
+                   if (eval > bestEval)
+                   {
+                       bestEval = eval;
+                       bestNode = child.Value;
+                   }
+               }
+               foreach (var child in root.Children)
+               {
+                   Node newNode;
+                   var eval = Select(child.Value, out newNode);
+                   if (eval > bestEval)
+                   {
+                       bestEval = eval;
+                       bestNode = newNode;
+                   }
+               }
+               return bestEval;
+           }      
+
+
 
         public override string ToString()
         {
