@@ -8,9 +8,9 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Label>Max głębokość poszukiwań:</Label>
-        <TextBox Grid.Row="1" Text="{Binding MaxDepth}" />
-        <Label Grid.Row="2">Max rząd drzewa:</Label>
-        <TextBox Grid.Row="3" Text="{Binding MaxTreeRank}" />
+        <TextBlock Margin="3">Max głębokość poszukiwań:</TextBlock>
+        <TextBox Margin="3" Grid.Row="1" Text="{Binding MaxDepth}" />
+        <TextBlock Margin="3" Grid.Row="2">Max rząd drzewa:</TextBlock>
+        <TextBox Margin="3" Grid.Row="3" Text="{Binding MaxTreeRank}" />
     </Grid>
 </UserControl>
