@@ -201,7 +201,7 @@ namespace Blokus.ViewModel
             {
                 IsVioletWinner = false; 
                 IsOrangeWinner = false;
-                GameState = new GameState();
+                GameState = new GameState() { OrangePlayer = this.OrangePlayer, VioletPlayer = this.VioletPlayer };
                 RefreshUI();
                 OrangePlayer.OnGameStart(GameState);
                 VioletPlayer.OnGameStart(GameState);
@@ -220,7 +220,7 @@ namespace Blokus.ViewModel
             {
                 IsVioletWinner = false;
                 IsOrangeWinner = false;
-                GameState = new GameState();
+                GameState = new GameState() { OrangePlayer = this.OrangePlayer, VioletPlayer = this.VioletPlayer };
                 RefreshUI();
                 OrangePlayer.OnGameStart(GameState);
                 VioletPlayer.OnGameStart(GameState);
@@ -327,7 +327,7 @@ namespace Blokus.ViewModel
                     IsOrangeWinner = false;
                     OrangePlayer.OnGameEnd(GameState);
                     VioletPlayer.OnGameEnd(GameState);
-                    GameState = new GameState();
+                    GameState = new GameState() { OrangePlayer = this.OrangePlayer, VioletPlayer = this.VioletPlayer };
                     OrangePlayer.OnGameStart(GameState);
                     VioletPlayer.OnGameStart(GameState);
                     PlayedGames++;
