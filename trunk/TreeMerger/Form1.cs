@@ -9,19 +9,21 @@ using System.Windows.Forms;
 using Blokus.Logic.MonteCarloTreeSearch;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using Blokus.Logic.MCTS;
 
 namespace TreeMerger
 {
     public partial class Form1 : Form
     {
-        List<MultipleTreeNode> trees;
-        MultipleTreeNode resultTree;
+        Node resultTree;
+        List<string> namesOfFiles;
+        BinaryFormatter bf = new BinaryFormatter();
 
         public Form1()
         {
             InitializeComponent();
-            trees = new List<MultipleTreeNode>();
             resultTree = null;
+            namesOfFiles = new List<string>();
         }
 
         private void selectToolStripMenuItem_Click(object sender, EventArgs e)
@@ -32,17 +34,23 @@ namespace TreeMerger
             ofd.Multiselect = true;
             if (ofd.ShowDialog() == DialogResult.OK && ofd.FileNames.Count()>0)
             {
-                FileStream fs;
-                BinaryFormatter bf = new BinaryFormatter();
                 foreach (string f in ofd.FileNames)
                 {
-                    fs = new FileStream(f, FileMode.Open);
-                    trees.Add((MultipleTreeNode)bf.Deserialize(fs));
-                    fs.Close();
+                    namesOfFiles.Add(f);
                 }
             }
 
         }
+
+        private Node getTreeFromFile(string f)
+        {
+            FileStream fs = new FileStream(f, FileMode.Open);
+            Node root = (Node)bf.Deserialize(fs);
+            fs.Close();
+            return root;
+        }
+
+
 
         private void saveResultToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -51,7 +59,6 @@ namespace TreeMerger
             if (sfd.ShowDialog() == DialogResult.OK)
             {
                 FileStream fs = new FileStream(sfd.FileName, FileMode.Create);
-                BinaryFormatter bf = new BinaryFormatter();
                 bf.Serialize(fs, resultTree);
                 fs.Close();
             }
@@ -59,31 +66,34 @@ namespace TreeMerger
 
         private void mergeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (trees.Count > 0 && resultTree==null)
+            if (namesOfFiles.Count > 0 && resultTree==null)
             {
-                resultTree = trees.ElementAt(0);
-                trees.Remove(resultTree);
+                resultTree = getTreeFromFile(namesOfFiles.ElementAt(0));
+                namesOfFiles.RemoveAt(0);
             }
-            foreach (MultipleTreeNode node in trees)
+            foreach (string f in namesOfFiles)
             {
-                Merge(ref resultTree, node);
+                Merge(ref resultTree, getTreeFromFile(f));
             }
+            MessageBox.Show("Trees merged", "SUCCESS", MessageBoxButtons.OK);
         }
 
-        private void Merge(ref MultipleTreeNode resultTree, MultipleTreeNode node)
+        private void Merge(ref Node resultTree, Node node)
         {
-            resultTree.visitCount += node.visitCount;
-            resultTree.victoryCount += node.victoryCount;
-            foreach (MultipleTreeNode child in node.childrenList)
+            resultTree.VisitCount += node.VisitCount;
+            resultTree.WinCount += node.WinCount;
+            foreach (var child in node.Children)
             {
-                if (!resultTree.childrenList.Exists(e => e.move.Equals(child.move)))
+                if (!resultTree.Children.ContainsKey(child.Key))// childrenList.Exists(e => e.move.Equals(child.move)))
                 {
-                    resultTree.childrenList.Add(child);
+                    resultTree.Children.Add(child.Key, child.Value);
                 }
                 else
                 {
-                    MultipleTreeNode pomchild = resultTree.childrenList.Find(e => e.move.Equals(child.move));
-                    Merge(ref pomchild, child);
+                    Node pomchild = (from ch in resultTree.Children
+                                    where ch.Key == child.Key
+                                    select ch.Value).Single();
+                    Merge(ref pomchild, child.Value);
                 }
             }
         }
