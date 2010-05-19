@@ -49,6 +49,10 @@
       <Project>{B4988AE9-5924-4330-BBD3-47FA82C57F6D}</Project>
       <Name>Blokus</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TreeMerger\TreeMerger.csproj">
+      <Project>{8E1848E5-2FBA-4AEC-94E1-8882A813592D}</Project>
+      <Name>TreeMerger</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -63,7 +63,7 @@ namespace TestProject1
         //
         #endregion
 
-        [TestMethod]
+    /*    [TestMethod]
         public void RulesTest()
         {
             var gs = new GameState();
@@ -85,6 +85,36 @@ namespace TestProject1
                     dict.Add(move.SerializedMove, move);
                 }
             }
+        }*/
+
+        [TestMethod]
+        public void MergeTest()
+        {
+            var root1 = new Node() { VisitCount = 9, WinCount = 5 };
+            var root2 = new Node() { VisitCount = 3, WinCount = 17 };
+
+            root1.AddChild(1, new Node() { VisitCount = 2, WinCount = 1 });
+            root1.AddChild(2, new Node());
+            root1.AddChild(3, new Node());
+
+            root2.AllMovesCount = 4;
+            root2.AddChild(1, new Node() { VisitCount = 3, WinCount = 3 });
+
+            root1[1].AddChild(7, new Node() { VisitCount = 55, WinCount = 0, AllMovesCount = 34 });
+            root2[1].AddChild(7, new Node() { VisitCount = 155, WinCount = 10});
+
+
+            TreeMerger.TreeMerger.Merge(root1, root2);
+
+            Assert.AreEqual(4, root1.AllMovesCount);
+            Assert.AreEqual(5, root1[1].VisitCount);
+            Assert.AreEqual(4, root1[1].WinCount);
+            Assert.AreEqual(12, root1.VisitCount);
+            Assert.AreEqual(22, root1.WinCount);
+
+            Assert.AreEqual(210, root1[1][7].VisitCount);
+            Assert.AreEqual(10, root1[1][7].WinCount);
+            Assert.AreEqual(34, root1[1][7].AllMovesCount);
         }
 
         [TestMethod]
@@ -92,11 +122,13 @@ namespace TestProject1
         {
             var root = new Node();
             var move = new Move(3);
-            root.Children.Add(move.SerializedMove, new Node() { VisitCount = 666, WinCount = 12 });
+            root.AddChild(move.SerializedMove, new Node() { VisitCount = 666, WinCount = 12 });
             move = new Move(1);
-            root.Children.Add(move.SerializedMove, new Node());
+            root.AddChild(move.SerializedMove, new Node());
+            root[1].AllMovesCount = 4;
             move = new Move(2);
-            root[3].Children.Add(move.SerializedMove, new Node() { VisitCount = 9, WinCount = 10 });
+            root[3].AddChild(move.SerializedMove, new Node() { VisitCount = 9, WinCount = 10 });
+            root.AllMovesCount = 42;
 
             var ms = new MemoryStream();
             BinaryFormatter bf = new BinaryFormatter();
@@ -113,7 +145,14 @@ namespace TestProject1
             Assert.IsTrue(actual[3].Children.Count == 1);
             Assert.IsTrue(actual[3].Children.ContainsKey(2));
             Assert.AreEqual(10, actual[3][2].WinCount);
-            Assert.AreEqual(9, actual[3][2].VisitCount);            
+            Assert.AreEqual(9, actual[3][2].VisitCount);
+
+            Assert.AreEqual(42, actual.AllMovesCount);
+            Assert.AreEqual(-1, actual[3].AllMovesCount);
+            Assert.AreEqual(4, actual[1].AllMovesCount);
+            Assert.AreEqual(-1, actual[3][2].AllMovesCount);
+            Assert.IsNull(actual[1].Children);
+            Assert.IsNull(actual[3][2].Children);
         }
 
         [TestMethod]
