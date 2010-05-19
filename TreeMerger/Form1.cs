@@ -73,29 +73,11 @@ namespace TreeMerger
             }
             foreach (string f in namesOfFiles)
             {
-                Merge(ref resultTree, getTreeFromFile(f));
+                TreeMerger.Merge(resultTree, getTreeFromFile(f));
             }
             MessageBox.Show("Trees merged", "SUCCESS", MessageBoxButtons.OK);
         }
 
-        private void Merge(ref Node resultTree, Node node)
-        {
-            resultTree.VisitCount += node.VisitCount;
-            resultTree.WinCount += node.WinCount;
-            foreach (var child in node.Children)
-            {
-                if (!resultTree.Children.ContainsKey(child.Key))// childrenList.Exists(e => e.move.Equals(child.move)))
-                {
-                    resultTree.Children.Add(child.Key, child.Value);
-                }
-                else
-                {
-                    Node pomchild = (from ch in resultTree.Children
-                                    where ch.Key == child.Key
-                                    select ch.Value).Single();
-                    Merge(ref pomchild, child.Value);
-                }
-            }
-        }
+
     }
 }

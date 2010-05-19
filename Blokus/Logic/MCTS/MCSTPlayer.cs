@@ -16,7 +16,8 @@ namespace Blokus.Logic.MCTS
     {
         public int VisitCount = 0;
         public int WinCount = 0;
-        public Dictionary<int, Node> Children = new Dictionary<int, Node>();
+        public Dictionary<int, Node> Children;
+        public int AllMovesCount = -1;
 
         public bool IsLeaf { get { return Children == null || Children.Count == 0; } }
 
@@ -42,6 +43,7 @@ namespace Blokus.Logic.MCTS
             VisitCount = info.GetInt32("v");
             WinCount = info.GetInt32("w");
             Children = (Dictionary<int, Node>)info.GetValue("d", typeof(Dictionary<int, Node>));
+            AllMovesCount = info.GetInt32("a");
         }
 
         #region ISerializable Members
@@ -51,9 +53,19 @@ namespace Blokus.Logic.MCTS
             info.AddValue("v", VisitCount);
             info.AddValue("w", WinCount);
             info.AddValue("d", Children);
+            info.AddValue("a", AllMovesCount);
         }
 
         #endregion
+
+        public void AddChild(int move, Node node)
+        {
+            if (Children == null)
+            {
+                Children = new Dictionary<int, Node>();
+            }
+            Children.Add(move, node);
+        }
     }
 
     public class MCSTPlayer : AIPlayer
@@ -116,11 +128,7 @@ namespace Blokus.Logic.MCTS
                     if (_CurrentNode == null) //dodaj do drzewa ruch przeciwnika
                     {
                         var node = new Node();
-                        /*  if (lastMove.SerializedMove == 33557264)
-                          {
-                              int a = 3;
-                          }*/
-                        parent.Children.Add(lastMove.SerializedMove, node);
+                        parent.AddChild(lastMove.SerializedMove, node);
                     }
                 }
             }
@@ -159,7 +167,7 @@ namespace Blokus.Logic.MCTS
         {
             _Heursitics.SortHand(gameState); //wymieszaj klocki
 
-            List<Move> moves;
+            HashSet<Move> moves = new HashSet<Move>();
             IEnumerable<Move> nodeChildren = null;
             if (node != null && !node.IsLeaf) //uzyj znanych ruchow z drzewa
             {
@@ -180,19 +188,25 @@ namespace Blokus.Logic.MCTS
                 return;
             }
 
-            moves = GameRules.GetMoves(gameState, MaxTreeRank); //pobierz MaxTreeRank pierwszych dostepnych ruchow
+            var moveslist = GameRules.GetMoves(gameState, MaxTreeRank); //pobierz MaxTreeRank pierwszych dostepnych ruchow
 
-            if (moves.Count == 0)
+            if (moveslist.Count == 0)
             {
                 return; // pozycja koncowa
             }
 
-            if (nodeChildren != null)
+            foreach (var n in moveslist)
             {
-                moves.AddRange(nodeChildren);
+                moves.Add(n);
             }
 
-            //   _Heursitics.SortMoves(gameState, moves); //posortuj ruchy by najlepsze byly na poczatku
+            if (nodeChildren != null)
+            {
+                foreach (var n in nodeChildren)
+                {
+                    moves.Add(n);
+                }
+            }
 
             Move bestMove = null;
             double maxEval = double.NegativeInfinity;
@@ -208,10 +222,10 @@ namespace Blokus.Logic.MCTS
             }
             if (node != null)
             {
-                if (!node.Children.ContainsKey(bestMove.SerializedMove)) //wychodzimy za drzewo
+                if (node.Children==null || !node.Children.ContainsKey(bestMove.SerializedMove)) //wychodzimy za drzewo
                 {
                     var newNode = new Node();
-                    node.Children.Add(bestMove.SerializedMove, newNode);
+                    node.AddChild(bestMove.SerializedMove, newNode);
                     _CurrentNode = null; //przestan sie posuwac w drzewie, by dodac tylko jeden wierzcholek na partie
                 }
             }
@@ -287,30 +301,48 @@ namespace Blokus.Logic.MCTS
         private int playSimulation(GameState state, Node node)
         {
             int result = 0;
+            List<Move> moves = null;
             if (node.VisitCount == 0)
             {
                 result = playrandomgame(state);
             }
             else
             {
-                if (node.IsLeaf)
+                if (node.Children==null || node.Children.Count != node.AllMovesCount)
                 {
-                    var moves = GameRules.GetMoves(state);
+                    moves = GameRules.GetMoves(state);
+                    node.AllMovesCount = moves.Count;
                     if (moves.Count == 0)
                     {
                         result = GameRules.GetWinner(state) == Player.Orange ? 1 : 0;
                         node.VisitCount += 1;
-                        node.WinCount += result;
-
+                        node.WinCount += result;                        
                         return result;
                     }
-                    foreach (var move in moves)
-                    {
-                        node.Children.Add(move.SerializedMove, new Node());
-                    }
                 }
-
-                var next = utcSelect(node);
+                KeyValuePair<int, Node>? next;
+                if (moves != null)
+                {
+                    int i = _Random.Next(moves.Count);
+                    if(!node.IsLeaf)
+                    {
+                        while(node.Children.ContainsKey(moves[i].SerializedMove))
+                        {
+                            i++;
+                            if(i>=moves.Count)
+                            {
+                                i=0;
+                            }
+                        }
+                    }
+                    var move = moves[i];
+                    next = new KeyValuePair<int, Node>(move.SerializedMove, new Node());
+                    node.AddChild(next.Value.Key, next.Value.Value);
+                }
+                else
+                {
+                    next = utcSelect(node);
+                }
                 state.AddMove(new Move(next.Value.Key));
                 state.SwapCurrentPlayer();
                 result = playSimulation(state, next.Value.Value);
@@ -344,38 +376,6 @@ namespace Blokus.Logic.MCTS
             }
             return GameRules.GetWinner(state)==Player.Orange ? 1:0;
         }
-
-
-           private double Select(Node root, out Node bestNode)
-           {
-               var ln = Math.Log10(root.VisitCount + 1.0);
-               var bestEval = double.NegativeInfinity;
-               bestNode = null;
-
-               foreach (var child in root.Children)
-               {
-                   var invN = 1.0 / (child.Value.VisitCount + 1.0);
-                   var eval = child.Value.WinCount * invN + _C * Math.Sqrt(ln*invN);
-                   if (eval > bestEval)
-                   {
-                       bestEval = eval;
-                       bestNode = child.Value;
-                   }
-               }
-               foreach (var child in root.Children)
-               {
-                   Node newNode;
-                   var eval = Select(child.Value, out newNode);
-                   if (eval > bestEval)
-                   {
-                       bestEval = eval;
-                       bestNode = newNode;
-                   }
-               }
-               return bestEval;
-           }      
-
-
 
         public override string ToString()
         {
