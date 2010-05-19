@@ -103,7 +103,7 @@ namespace Blokus.Logic.MCTS
         public override void OnGameStart(GameState gameState)
         {
             _CurrentNode = _Root;
-            _Training = gameState.VioletPlayer is MCSTPlayer && gameState.OrangePlayer is MCSTPlayer;
+     /*       _Training = gameState.VioletPlayer is MCSTPlayer && gameState.OrangePlayer is MCSTPlayer;*/
             if (gameState.AllMoves.Count > 0)
             {
                 throw new InvalidDataException("Nieprawidłowy gamestate");
@@ -112,7 +112,7 @@ namespace Blokus.Logic.MCTS
 
         public override Move GetMove(GameState gameState)
         {
-            if (_Training)
+       /*     if (_Training)
             {
                 if (gameState.CurrentPlayerColor == Player.Orange)
                 {
@@ -124,7 +124,7 @@ namespace Blokus.Logic.MCTS
                     Play(gameState, _Root);
                 }
                 return null;
-            }
+            }*/
 
             if (gameState.AllMoves.Count > 0) // posun currentNode o ruch przeciwnika
             {
@@ -153,7 +153,7 @@ namespace Blokus.Logic.MCTS
 
         public override void OnGameEnd(GameState gameState)
         {
-            if (!_Training)
+            /*if (!_Training)*/
             {
                 int result = GameRules.GetWinner(gameState) == Player.Orange ? 1 : 0;
 
@@ -194,6 +194,10 @@ namespace Blokus.Logic.MCTS
             else //wyszlismy poza drzewo, zwroc ruch z innego algorytmu
             {
                 _LastMove = _Playouter.GetMove(gameState);
+                if (node != null && _LastMove!=null)
+                {
+                    node.AddChild(_LastMove.SerializedMove, new Node());
+                }
                 return;
             }
 
@@ -250,18 +254,18 @@ namespace Blokus.Logic.MCTS
             {
                 if (_MyColor == Player.Orange)
                 {
-                    result = (node.WinCount + 0.01) / (node.VisitCount + 0.1);
+                    result = ((double)node.WinCount) / (node.VisitCount + 0.01);
                 }
                 else
                 {
-                    result = ((node.VisitCount - node.WinCount) + 0.01) / (node.VisitCount + 0.1);
+                    result = ((double)(node.VisitCount - node.WinCount)) / (node.VisitCount + 0.01);
                 }
             }
             else // wierzcholka nie ma w drzewie, uzyj heurystycznej oceny
             {
                 gameState.AddMove(move);
                 gameState.SwapCurrentPlayer();
-                result = 0.5 - _Heursitics.GetBoardEvaluation(gameState);
+                result = 2.0 - _Heursitics.GetBoardEvaluation(gameState);
                 gameState.SwapCurrentPlayer();
                 gameState.DelMove(move);
             }
@@ -276,7 +280,7 @@ namespace Blokus.Logic.MCTS
 
         //tryb treningu - UCT
 
-        private double _C = 1.0;
+     /*   private double _C = 1.0;
 
         /// <summary>
         /// zwraca node lub najlepsze z dzieci node i jego ocene. 
@@ -500,7 +504,7 @@ namespace Blokus.Logic.MCTS
                 state.SwapCurrentPlayer();
             }
             return GameRules.GetWinner(state)==Player.Orange ? 1:0;
-        }
+        }*/
 
         public override string ToString()
         {
