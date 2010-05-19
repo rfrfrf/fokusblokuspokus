@@ -217,7 +217,10 @@ namespace Blokus.Logic.MCTS
             {
                 foreach (var n in nodeChildren)
                 {
-                    moves.Add(n);
+                    if (!moves.Contains(n))
+                    {
+                        moves.Add(n);
+                    }
                 }
             }
 
