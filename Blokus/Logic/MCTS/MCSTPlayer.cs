@@ -84,7 +84,7 @@ namespace Blokus.Logic.MCTS
         {
             if (_Root == null)
             {
-                _Root = new Node();
+                _Root = new Node() { VisitCount = 1 };
             }
         }
 
@@ -104,6 +104,10 @@ namespace Blokus.Logic.MCTS
         {
             _CurrentNode = _Root;
             _Training = gameState.VioletPlayer is MCSTPlayer && gameState.OrangePlayer is MCSTPlayer;
+            if (gameState.AllMoves.Count > 0)
+            {
+                throw new InvalidDataException("Nieprawidłowy gamestate");
+            }
         }
 
         public override Move GetMove(GameState gameState)
@@ -112,7 +116,12 @@ namespace Blokus.Logic.MCTS
             {
                 if (gameState.CurrentPlayerColor == Player.Orange)
                 {
-                    uctSearch(gameState, _Root);
+                    if (gameState.AllMoves.Count > 0)
+                    {
+                        throw new InvalidDataException("Nieprawidłowy gamestate");
+                    }
+                  //  uctSearch(gameState, _Root);
+                    Play(gameState, _Root);
                 }
                 return null;
             }
@@ -269,6 +278,122 @@ namespace Blokus.Logic.MCTS
 
         private double _C = 1.0;
 
+        /// <summary>
+        /// zwraca node lub najlepsze z dzieci node i jego ocene. 
+        /// path - jak dojsc do wezla, dla roota jest puste
+        /// </summary>
+        private KeyValuePair<double, Node> Select(Node node, int parentVisitcount, List<int> path)
+        {
+            var bestutc = double.NegativeInfinity;
+            Node bestnode = null;
+
+            if (node.IsLeaf || node.Children.Count < node.AllMovesCount)
+            {
+                double invVisit = 1.0 / ((double)node.VisitCount);
+                double winrate = node.WinCount * invVisit;
+                double utc = _C * Math.Sqrt(Math.Log(parentVisitcount, Math.E) * invVisit);
+                bestutc = winrate + utc;
+                bestnode = node;
+            }
+            List<int> bestpath = null;
+
+            if (!node.IsLeaf)
+            {
+                foreach (var n in node.Children)
+                {
+                    if (n.Value.VisitCount != 0 && n.Value.AllMovesCount != 0)
+                    {
+                        var localpath = new List<int>() { n.Key };
+
+                        var val = Select(n.Value, node.VisitCount, localpath);
+                        if (val.Key > bestutc)
+                        {
+                            bestutc = val.Key;
+                            bestnode = val.Value;
+                            bestpath = localpath;
+                        }
+                    }
+                }
+                if (bestpath != null)
+                {
+                    path.AddRange(bestpath);
+                }
+            }
+            return new KeyValuePair<double,Node>(bestutc, bestnode);
+        }
+
+        private int Play(GameState state, Node node)
+        {
+            var path = new List<int>();
+            KeyValuePair<double, Node> pair;
+            if (_Root.Children != null && _Root.Children.Count == _Root.AllMovesCount) //najpeirw wszystkie dzieci roota sprawdz
+            {
+                pair = Select(node, int.MaxValue, path);
+            }
+            else
+            {
+                pair = new KeyValuePair<double, Node>(0, node);
+            }
+            int result;
+            foreach (var move in path)
+            {
+                state.AddMove(new Move(move));
+                state.SwapCurrentPlayer();
+            }
+            var expandedNode = pair.Value;
+            if (expandedNode == null)
+            {
+                throw new InvalidDataException("Przejrzałeś całe drzewo gry (podejrzane)");
+            }
+            var moves = GameRules.GetMoves(state);
+            int newMove;
+            if (expandedNode.IsLeaf)
+            {
+                expandedNode.AllMovesCount = moves.Count;
+                if (moves.Count == 0)
+                {
+                    result = GameRules.GetWinner(state) == Player.Orange ? 1 : 0;
+                    UpdatePath(node, path, result);
+                    return result;
+                }
+                newMove = moves[_Random.Next(moves.Count)].SerializedMove;
+                expandedNode.AddChild(newMove, new Node());
+            }
+            else
+            {
+                int i = _Random.Next(moves.Count);
+                while (expandedNode.Children.ContainsKey(moves[i].SerializedMove))
+                {
+                    i++;
+                    if (i >= moves.Count)
+                    {
+                        i = 0;
+                    }
+                }
+                newMove = moves[i].SerializedMove;
+                expandedNode.AddChild(newMove, new Node());
+            }
+            path.Add(newMove);
+            state.AddMove(new Move(newMove));
+            state.SwapCurrentPlayer();
+            result = playrandomgame(state);
+
+            UpdatePath(node, path, result);
+            return result;
+        }
+
+        private void UpdatePath(Node node, List<int> path, int result)
+        {
+            foreach (var move in path)
+            {
+                node.VisitCount++;
+                node.WinCount += result;
+                node = node[move];
+            }
+            node.VisitCount++;
+            node.WinCount += result;
+        }
+
         private KeyValuePair<int, Node>? utcSelect(Node node)
         {
             var bestutc = 0.0;
@@ -308,7 +433,7 @@ namespace Blokus.Logic.MCTS
             }
             else
             {
-                if (node.Children==null || node.Children.Count != node.AllMovesCount)
+                if (node.IsLeaf || (_Random.Next(2)==0 && node.Children.Count != node.AllMovesCount))
                 {
                     moves = GameRules.GetMoves(state);
                     node.AllMovesCount = moves.Count;
@@ -403,7 +528,7 @@ namespace Blokus.Logic.MCTS
             }
             catch (Exception)
             {
-                _Root = new Node();
+                _Root = new Node() { VisitCount = 1 };
                 MessageBox.Show("Nie udało się wczytać drzewa. Utworzono nowe.");
             }
 
