@@ -16,6 +16,7 @@ using Blokus.Misc;
 using Blokus.Logic;
 using Blokus.Logic.MonteCarloTreeSearch;
 using Blokus.Logic.MCTS;
+using Blokus.Logic.MCTS2v2;
 
 namespace Blokus.UI
 {
@@ -32,7 +33,8 @@ namespace Blokus.UI
             InitializeComponent();
       //      MultipleTree.ReadTree(MonteCarloTreeSearchPlayer.filename);// = new MultipleTree();
             //MonteCarloTreeSearchPlayer.tree.ReadTree(MonteCarloTreeSearchPlayer.filename);
-            MCSTPlayer.ReadTree(filename);
+            //MCSTPlayer.ReadTree(filename);
+            MCTS2v2Player.ReadTree(filename);
         }
 
         void Board_Click(object sender, BoardClickEventArgs e)
@@ -63,7 +65,8 @@ namespace Blokus.UI
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             //MultipleTree.SaveTree(MonteCarloTreeSearchPlayer.filename);
-            MCSTPlayer.SaveTree(filename);
+            //MCSTPlayer.SaveTree(filename);
+            MCTS2v2Player.SaveTree(filename);
         }
 
         private void ComboBox_Loaded(object sender, RoutedEventArgs e)

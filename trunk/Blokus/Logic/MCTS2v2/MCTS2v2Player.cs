@@ -29,13 +29,17 @@ namespace Blokus.Logic.MCTS2v2
             //me = gameState.OrangePlayer is MCTS2v2Player ? (gameState.VioletPlayer is MCTS2v2Player ? Player.None : Player.Orange) : Player.Violet;
             currentNode = _Root;
             simulationStrategy.MaxDepth = 3;
-            base.OnGameStart(gameState);
+            //base.OnGameStart(gameState);
         }
 
 
 
         public override Move GetMove(GameState gameState)
         {
+            if (currentNode == null && gameState.AllMoves.Count > 2)
+            {
+                return null;
+            }
 
             if (gameState.AllMoves.Count != 0 && currentNode != null)
             {
@@ -51,7 +55,18 @@ namespace Blokus.Logic.MCTS2v2
                 }
             }
             MCTSSolver(gameState, currentNode);
-            return SelectOptimumMoveToPut(gameState, currentNode);
+            Node pomn = null;
+            Move res = SelectOptimumMoveToPut(gameState, currentNode, out pomn);
+            if (res != null)
+            {
+                currentNode = pomn;
+            }
+            else
+            {
+                currentNode = null;
+            }
+            return res;
+
         }
 
 
@@ -165,16 +180,17 @@ namespace Blokus.Logic.MCTS2v2
         //    throw new NotImplementedException();
         //}
 
-        private Move SelectOptimumMoveToPut(GameState gameState, Node currNode)
+        private Move SelectOptimumMoveToPut(GameState gameState, Node currNode, out Node nextNode)
         {
-            Node pomNode=null;
+            //Node pomNode=null;
             int pommove = 0;
-            FindMaximizedNode(null, currentNode, (node, move) => { return node.value + Avalue / Math.Sqrt(node.VisitCount); }, out pomNode, out pommove);
-            return new Move(pommove);
+            FindMaximizedNode(null, currentNode, (node, move) => { return node.value + Avalue / Math.Sqrt(node.VisitCount); }, out nextNode, out pommove);
+            return pommove!=0? new Move(pommove):null;
         }
 
-        private int PlaySimulatedGame(GameState state)
+        private int PlaySimulatedGame(GameState gstate)
         {
+            GameState state = gstate.Clone();
             Player player = state.CurrentPlayerColor;
             while (true)
             {
@@ -209,7 +225,7 @@ namespace Blokus.Logic.MCTS2v2
         {
             double maxVal = double.NegativeInfinity, currVal = double.NegativeInfinity;
             n = null;
-            move = int.MinValue;
+            move = 0;
 
             foreach (var d in toLook.Children)
             {
@@ -274,7 +290,6 @@ namespace Blokus.Logic.MCTS2v2
             }
 
         }
-
 
 
 

@@ -36,6 +36,7 @@ namespace Blokus.Logic.MCTS2v2
         public Node(Node _parent)
         {
             parent = _parent;
+            Children = new Dictionary<int, Node>();
         }
 
         protected Node(SerializationInfo info, StreamingContext context)
@@ -64,7 +65,10 @@ namespace Blokus.Logic.MCTS2v2
             {
                 Children = new Dictionary<int, Node>();
             }
-            Children.Add(move, node);
+            if (!Children.ContainsKey(move))
+            {
+                Children.Add(move, node);
+            }
         }
 
         public void computeAverage(int R)
