@@ -5,19 +5,30 @@ using System.Text;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
+using Blokus.Logic.Scout;
 
 namespace Blokus.Logic.MCTS2v2
 {
     [Serializable]
-    public class MCTS2v2Player:AIPlayer
+    public class MCTS2v2Player : AIPlayer
     {
 
         private static Node _Root;
         //private Player me;
+        private Random _Random = new Random();
+        private delegate double MaximumFormula(Node n, int move);
+        private Node currentNode;
+        private ScoutPlayer simulationStrategy = new ScoutPlayer();
+        private const int visitTreshhold = 5;
+        private const double Cvalue = 1;
+
+        private const double Avalue = 1;
 
         public override void OnGameStart(GameState gameState)
         {
             //me = gameState.OrangePlayer is MCTS2v2Player ? (gameState.VioletPlayer is MCTS2v2Player ? Player.None : Player.Orange) : Player.Violet;
+            currentNode = _Root;
+            simulationStrategy.MaxDepth = 3;
             base.OnGameStart(gameState);
         }
 
@@ -25,11 +36,25 @@ namespace Blokus.Logic.MCTS2v2
 
         public override Move GetMove(GameState gameState)
         {
-            MCTSSolver(gameState, _Root);
-            return SelectOptimumMoveToPut(gameState);
+
+            if (gameState.AllMoves.Count != 0 && currentNode != null)
+            {
+                if (currentNode.Children.ContainsKey(gameState.AllMoves[gameState.AllMoves.Count - 1].SerializedMove))
+                {
+                    currentNode = currentNode.Children.First(e => e.Key == gameState.AllMoves[gameState.AllMoves.Count - 1].SerializedMove).Value;
+                }
+                else
+                {
+                    Node pom = new Node(currentNode);
+                    currentNode.Children.Add(gameState.AllMoves[gameState.AllMoves.Count - 1].SerializedMove, pom);
+                    currentNode = pom;
+                }
+            }
+            MCTSSolver(gameState, currentNode);
+            return SelectOptimumMoveToPut(gameState, currentNode);
         }
 
-        
+
 
         private int MCTSSolver(GameState gameState, Node node)
         {
@@ -54,7 +79,7 @@ namespace Blokus.Logic.MCTS2v2
 
             Node bestchild;
             Move bestchildmove;
-            Select(node, out bestchild, out bestchildmove);
+            Select(gameState, node, out bestchild, out bestchildmove);
             node.VisitCount++;
 
             int R = 0;
@@ -63,7 +88,11 @@ namespace Blokus.Logic.MCTS2v2
             {
                 if (bestchild.VisitCount == 0)
                 {
-                    R = -Playout(bestchild);
+                    gameState.AddMove(bestchildmove);
+                    gameState.SwapCurrentPlayer();
+                    R = -PlaySimulatedGame(gameState); //być może bez minusa
+                    gameState.SwapCurrentPlayer();
+                    gameState.DelMove(bestchildmove);
                     node.AddChild(bestchildmove.SerializedMove, bestchild);
                     node.computeAverage(R);
                     return R;
@@ -108,24 +137,111 @@ namespace Blokus.Logic.MCTS2v2
 
         }
 
-        private void Select(Node node, out Node bestchild, out Move bestchildmove)
+        private void Select(GameState gs, Node node, out Node bestchild, out Move bestchildmove)
         {
-            throw new NotImplementedException();
+            //Node pomNode = null;
+            int pomMove = 0;
+            FindMaximizedNode(gs, node, (n, move) => {
+
+                if (node.VisitCount > visitTreshhold)
+                {
+                    return n.value + Math.Sqrt(Cvalue * Math.Log(n.parent != null ? n.parent.VisitCount : 1, Math.E) / n.VisitCount);
+                }
+                else
+                {
+                    return 0;
+                }
+                
+                
+                ;}
+                
+                
+                , out bestchild, out pomMove);
+            bestchildmove = new Move(pomMove);
         }
 
-        private int Playout(Node bestchild)
+        //private int Playout(Node bestchild)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        private Move SelectOptimumMoveToPut(GameState gameState, Node currNode)
         {
-            throw new NotImplementedException();
+            Node pomNode=null;
+            int pommove = 0;
+            FindMaximizedNode(null, currentNode, (node, move) => { return node.value + Avalue / Math.Sqrt(node.VisitCount); }, out pomNode, out pommove);
+            return new Move(pommove);
         }
 
-        private Move SelectOptimumMoveToPut(GameState gameState)
+        private int PlaySimulatedGame(GameState state)
         {
-            throw new NotImplementedException();
+            Player player = state.CurrentPlayerColor;
+            while (true)
+            {
+                //var moves = GameRules.GetMoves(state);
+                //if (moves.Count == 0)
+                //{
+                //    break;
+                //}
+                var move = simulationStrategy.GetMove(state);
+                if (move == null)
+                {
+                    break;
+                }
+                state.AddMove(move);
+                state.SwapCurrentPlayer();
+            }
+            Player winner = GameRules.GetWinner(state);
+            return winner == player ? 1 : (winner == Player.None ? 0 : -1);
         }
 
 
-        
+        /// <summary>
+        /// Znajduje najlepsze dziecko wg formuly mf
+        /// Gdy gs==null to szuka tylko wśród dzieci w drzewie
+        /// </summary>
+        /// <param name="gs"></param>
+        /// <param name="toLook"></param>
+        /// <param name="mf"></param>
+        /// <param name="n"></param>
+        /// <param name="move"></param>
+        private void FindMaximizedNode(GameState gs, Node toLook, MaximumFormula mf, out Node n, out int move)
+        {
+            double maxVal = double.NegativeInfinity, currVal = double.NegativeInfinity;
+            n = null;
+            move = int.MinValue;
 
+            foreach (var d in toLook.Children)
+            {
+                currVal = mf(d.Value, d.Key);
+                if (currVal > maxVal)
+                {
+                    maxVal = currVal;
+                    n = d.Value;
+                    move = d.Key;
+                }
+            }
+            if (gs != null)
+            {
+                List<Move> moves = GameRules.GetMoves(gs);
+                foreach (Move m in moves)
+                {
+                    if(!toLook.Children.ContainsKey(m.SerializedMove))//jeśli nie zawiera
+                    {
+                        Node nd = new Node(toLook);
+                        currVal = mf(nd, m.SerializedMove);
+                        if (currVal > maxVal)
+                        {
+                            maxVal = currVal;
+                            n = nd;
+                            move = m.SerializedMove;
+                        }
+                    }
+                }
+            }
+
+
+        }
 
 
 
@@ -153,7 +269,7 @@ namespace Blokus.Logic.MCTS2v2
             }
             catch (Exception)
             {
-                _Root = new Node() { VisitCount = 1 };
+                _Root = new Node(null) { VisitCount = 1 };
                 MessageBox.Show("Nie udało się wczytać drzewa. Utworzono nowe.");
             }
 

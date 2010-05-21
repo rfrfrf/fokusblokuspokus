@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Runtime.Serialization;
 
 namespace Blokus.Logic.MCTS2v2
 {
@@ -12,7 +13,8 @@ namespace Blokus.Logic.MCTS2v2
         public int WinCount = 0;
         public Dictionary<int, Node> Children;
         public int AllMovesCount = -1;
-        public int value=0;
+        public int value = 0;
+        public Node parent;
 
         public bool IsLeaf { get { return Children == null || Children.Count == 0; } }
 
@@ -31,7 +33,10 @@ namespace Blokus.Logic.MCTS2v2
             }
         }
 
-        public Node() { }
+        public Node(Node _parent)
+        {
+            parent = _parent;
+        }
 
         protected Node(SerializationInfo info, StreamingContext context)
         {
@@ -64,6 +69,14 @@ namespace Blokus.Logic.MCTS2v2
 
         public void computeAverage(int R)
         {
-            return;
+            if (R == int.MaxValue || R == int.MinValue)
+            {
+                this.value = R;
+            }
+            else
+            {
+                value += R;
+            }
         }
+    }
 }
