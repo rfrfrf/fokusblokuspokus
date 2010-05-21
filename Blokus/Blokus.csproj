@@ -112,6 +112,7 @@
     <Compile Include="Logic\PiecePosition.cs" />
     <Compile Include="Logic\Pieces.cs" />
     <Compile Include="Logic\PieceVariant.cs" />
+    <Compile Include="Logic\RandomPlayer\RandomPlayer.cs" />
     <Compile Include="Logic\Scout\ScoutHeuristics.cs" />
     <Compile Include="Logic\Scout\ScoutPlayer.cs" />
     <Compile Include="Misc\BoardClickEventArgs.cs" />
