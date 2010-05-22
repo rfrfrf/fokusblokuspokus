@@ -7,9 +7,30 @@ namespace Blokus.Logic.AlphaBeta
 {
     class AlphaBetaHeuristics : Heuristics
     {
+        private bool nonDeterministic = false;
+        private Random _Random = new Random();
+
+        public AlphaBetaHeuristics()
+        {
+        }
+
+        public AlphaBetaHeuristics(bool nonDeterministic)
+        {
+            this.nonDeterministic = nonDeterministic;
+        }
+
         public override double GetBoardEvaluation(GameState gameState)
         {
-            return GameRules.GetMoves(gameState).Count*0.0001;
+            double add =0.0;
+            if (nonDeterministic)
+            {
+                add = _Random.NextDouble();
+                add *= add;
+                add *= add;
+                add *= add;
+            }
+
+            return GameRules.GetMoves(gameState).Count * 0.0001 * (1 + add);
         }
 
   /*      /// <summary>

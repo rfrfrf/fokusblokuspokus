@@ -26,14 +26,14 @@ namespace Blokus.UI
     public partial class MainWindow : Window
     {
         string filename = "tree.dat";
-
+        string filename2 = "tree2.dat";
         public MainWindow()
         {
             this.DataContext = new GameCoordinator();
             InitializeComponent();
       //      MultipleTree.ReadTree(MonteCarloTreeSearchPlayer.filename);// = new MultipleTree();
             //MonteCarloTreeSearchPlayer.tree.ReadTree(MonteCarloTreeSearchPlayer.filename);
-            //MCSTPlayer.ReadTree(filename);
+            MCSTPlayer.ReadTree(filename2);
             MCTS2v2Player.ReadTree(filename);
         }
 
@@ -65,7 +65,7 @@ namespace Blokus.UI
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             //MultipleTree.SaveTree(MonteCarloTreeSearchPlayer.filename);
-            //MCSTPlayer.SaveTree(filename);
+            MCSTPlayer.SaveTree(filename2);
             MCTS2v2Player.SaveTree(filename);
         }
 
