@@ -19,10 +19,12 @@ namespace Blokus.Logic.MCTS2v2
         private delegate double MaximumFormula(Node n, int move);
         private Node currentNode;
         private ScoutPlayer simulationStrategy = new ScoutPlayer();
-        private const int visitTreshhold = 5;
+        private const int visitTreshhold = 1;
         private const double Cvalue = 1;
 
         private const double Avalue = 1;
+
+        private int lastMovesCount = -1;
 
         public override void OnGameStart(GameState gameState)
         {
@@ -36,7 +38,8 @@ namespace Blokus.Logic.MCTS2v2
 
         public override Move GetMove(GameState gameState)
         {
-            if (currentNode == null && gameState.AllMoves.Count > 2)
+            List<Move> mmmoves = GameRules.GetMoves(gameState);
+            if (currentNode == null && gameState.AllMoves.Count > 2 || mmmoves.Count==0)
             {
                 return null;
             }
@@ -49,11 +52,16 @@ namespace Blokus.Logic.MCTS2v2
                 }
                 else
                 {
+                    //albo nie ma ruchu bo nie bylo go w drzewie, albo przeciwnik jest zablokowany
+                    if(lastMovesCount!=gameState.AllMoves.Count)
+                    {
                     Node pom = new Node(currentNode);
                     currentNode.Children.Add(gameState.AllMoves[gameState.AllMoves.Count - 1].SerializedMove, pom);
                     currentNode = pom;
+                    }
                 }
             }
+            lastMovesCount = gameState.AllMoves.Count;
             MCTSSolver(gameState, currentNode);
             Node pomn = null;
             Move res = SelectOptimumMoveToPut(gameState, currentNode, out pomn);
@@ -158,7 +166,7 @@ namespace Blokus.Logic.MCTS2v2
             int pomMove = 0;
             FindMaximizedNode(gs, node, (n, move) => {
 
-                if (node.VisitCount > visitTreshhold)
+                if (n.VisitCount >= visitTreshhold)
                 {
                     return n.value + Math.Sqrt(Cvalue * Math.Log(n.parent != null ? n.parent.VisitCount : 1, Math.E) / n.VisitCount);
                 }
