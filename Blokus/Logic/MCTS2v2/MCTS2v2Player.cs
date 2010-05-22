@@ -19,12 +19,15 @@ namespace Blokus.Logic.MCTS2v2
         private delegate double MaximumFormula(Node n, int move);
         private Node currentNode, currentNodeParent;
         private ScoutPlayer simulationStrategy = new ScoutPlayer();
-        private const int visitTreshhold = 1;
+        private const int visitTreshhold = 100;
         private const double Cvalue = 1;
 
         private const double Avalue = 1;
 
         private int lastMovesCount = -1;
+
+        List<Node> prevNodes;
+        private int movesWhenOpponentBlocked;
 
         public override void OnGameStart(GameState gameState)
         {
@@ -32,6 +35,10 @@ namespace Blokus.Logic.MCTS2v2
             currentNode = _Root;
             currentNodeParent = null;
             simulationStrategy.MaxDepth = 3;
+            prevNodes = new List<Node>();
+            prevNodes.Add(currentNode);
+            movesWhenOpponentBlocked = int.MaxValue;
+            lastMovesCount = -1;
             //base.OnGameStart(gameState);
         }
 
@@ -40,37 +47,48 @@ namespace Blokus.Logic.MCTS2v2
         public override Move GetMove(GameState gameState)
         {
             List<Move> mmmoves = GameRules.GetMoves(gameState);
-            if (currentNode == null && gameState.AllMoves.Count > 2 || mmmoves.Count==0)
+            if (currentNode == null && gameState.AllMoves.Count > 2 || mmmoves.Count == 0)
             {
                 return null;
             }
 
             if (gameState.AllMoves.Count != 0 && currentNode != null)
             {
-                if (currentNode.Children!=null && currentNode.Children.ContainsKey(gameState.AllMoves[gameState.AllMoves.Count - 1].SerializedMove))
+                if (currentNode.Children != null && currentNode.Children.ContainsKey(gameState.AllMoves[gameState.AllMoves.Count - 1].SerializedMove))
                 {
                     currentNodeParent = currentNode;
                     currentNode = currentNode.Children.First(e => e.Key == gameState.AllMoves[gameState.AllMoves.Count - 1].SerializedMove).Value;
+                    prevNodes.Add(currentNode);
                 }
                 else
                 {
                     //albo nie ma ruchu bo nie bylo go w drzewie, albo przeciwnik jest zablokowany
-                    if(lastMovesCount!=gameState.AllMoves.Count)
+                    if (lastMovesCount != gameState.AllMoves.Count)
                     {
                         currentNodeParent = currentNode;
-                    Node pom = new Node();//currentNode);
-                    currentNode.AddChild(gameState.AllMoves[gameState.AllMoves.Count - 1].SerializedMove, pom);
-                    currentNode = pom;
+                        Node pom = new Node();//currentNode);
+                        currentNode.AddChild(gameState.AllMoves[gameState.AllMoves.Count - 1].SerializedMove, pom);
+                        currentNode = pom;
+                        prevNodes.Add(currentNode);
+                    }
+                    else
+                    {
+                        if (movesWhenOpponentBlocked == int.MaxValue)
+                        {
+                            movesWhenOpponentBlocked = gameState.AllMoves.Count;
+                        }
                     }
                 }
             }
             lastMovesCount = gameState.AllMoves.Count;
-            MCTSSolver(gameState, currentNode, currentNodeParent);
+            int R = -MCTSSolver(gameState, currentNode, currentNodeParent);
+            BackpropagateToRoot(R);
             Node pomn = null;
             Move res = SelectOptimumMoveToPut(gameState, currentNode, out pomn);
             if (res != null)
             {
                 currentNode = pomn;
+                prevNodes.Add(currentNode);
             }
             else
             {
@@ -78,6 +96,56 @@ namespace Blokus.Logic.MCTS2v2
             }
             return res;
 
+        }
+
+        private void BackpropagateToRoot(int R)
+        {
+            if (prevNodes.Count <= 1)
+            {
+                return;
+            }
+            Node node = null;
+            for (int i = prevNodes.Count-2; i>=0; i--)
+            {
+                node = prevNodes.ElementAt(i);
+                ReverseOrNotR(ref R, i);
+                if (R == int.MaxValue)
+                {
+                    node.value = int.MinValue;
+                    //R *= -1;
+                    continue;
+                }
+                else if (R == int.MinValue)
+                {
+                    CheckChildren(ref R, node);
+                    //R *= -1;
+                    continue;
+                }
+
+                node.computeAverage(R);
+                //R *= -1;
+                continue;
+            }
+        }
+
+        private void ReverseOrNotR(ref int R, int i)
+        {
+            R *= i < movesWhenOpponentBlocked ? -1 : 1;
+        }
+
+        private static void CheckChildren(ref int R, Node node)
+        {
+            foreach (var c in node.Children)
+            {
+                if (c.Value.value != R)
+                {
+                    R = -1;
+                    node.computeAverage(R);
+                    //return R;
+                }
+            }
+            node.value = int.MaxValue;
+            //return R;
         }
 
 
@@ -167,7 +235,8 @@ namespace Blokus.Logic.MCTS2v2
         {
             //Node pomNode = null;
             int pomMove = 0;
-            FindMaximizedNode(gs, node, (n, move) => {
+            FindMaximizedNode(gs, node, (n, move) =>
+            {
 
                 if (n.VisitCount >= visitTreshhold)
                 {
@@ -177,11 +246,12 @@ namespace Blokus.Logic.MCTS2v2
                 {
                     return 0;
                 }
-                
-                
-                ;}
-                
-                
+
+
+                ;
+            }
+
+
                 , out bestchild, out pomMove);
             bestchildmove = new Move(pomMove);
         }
@@ -196,7 +266,7 @@ namespace Blokus.Logic.MCTS2v2
             //Node pomNode=null;
             int pommove = 0;
             FindMaximizedNode(null, currentNode, (node, move) => { return node.value + Avalue / Math.Sqrt(node.VisitCount); }, out nextNode, out pommove);
-            return pommove!=0? new Move(pommove):null;
+            return pommove != 0 ? new Move(pommove) : null;
         }
 
         private int PlaySimulatedGame(GameState gstate)
@@ -255,7 +325,7 @@ namespace Blokus.Logic.MCTS2v2
                 List<Move> moves = GameRules.GetMoves(gs);
                 foreach (Move m in moves)
                 {
-                    if(toLook.Children==null || !toLook.Children.ContainsKey(m.SerializedMove))//jeśli nie zawiera
+                    if (toLook.Children == null || !toLook.Children.ContainsKey(m.SerializedMove))//jeśli nie zawiera
                     {
                         Node nd = new Node();//toLook);
                         currVal = mf(nd, m.SerializedMove);
