@@ -47,7 +47,7 @@ namespace Blokus.Logic.MCTS2v2
 
             if (gameState.AllMoves.Count != 0 && currentNode != null)
             {
-                if (currentNode.Children.ContainsKey(gameState.AllMoves[gameState.AllMoves.Count - 1].SerializedMove))
+                if (currentNode.Children!=null && currentNode.Children.ContainsKey(gameState.AllMoves[gameState.AllMoves.Count - 1].SerializedMove))
                 {
                     currentNodeParent = currentNode;
                     currentNode = currentNode.Children.First(e => e.Key == gameState.AllMoves[gameState.AllMoves.Count - 1].SerializedMove).Value;
@@ -59,7 +59,7 @@ namespace Blokus.Logic.MCTS2v2
                     {
                         currentNodeParent = currentNode;
                     Node pom = new Node();//currentNode);
-                    currentNode.Children.Add(gameState.AllMoves[gameState.AllMoves.Count - 1].SerializedMove, pom);
+                    currentNode.AddChild(gameState.AllMoves[gameState.AllMoves.Count - 1].SerializedMove, pom);
                     currentNode = pom;
                     }
                 }
@@ -237,15 +237,17 @@ namespace Blokus.Logic.MCTS2v2
             double maxVal = double.NegativeInfinity, currVal = double.NegativeInfinity;
             n = null;
             move = 0;
-
-            foreach (var d in toLook.Children)
+            if (toLook.Children != null)
             {
-                currVal = mf(d.Value, d.Key);
-                if (currVal > maxVal)
+                foreach (var d in toLook.Children)
                 {
-                    maxVal = currVal;
-                    n = d.Value;
-                    move = d.Key;
+                    currVal = mf(d.Value, d.Key);
+                    if (currVal > maxVal)
+                    {
+                        maxVal = currVal;
+                        n = d.Value;
+                        move = d.Key;
+                    }
                 }
             }
             if (gs != null)
@@ -253,7 +255,7 @@ namespace Blokus.Logic.MCTS2v2
                 List<Move> moves = GameRules.GetMoves(gs);
                 foreach (Move m in moves)
                 {
-                    if(!toLook.Children.ContainsKey(m.SerializedMove))//jeśli nie zawiera
+                    if(toLook.Children==null || !toLook.Children.ContainsKey(m.SerializedMove))//jeśli nie zawiera
                     {
                         Node nd = new Node();//toLook);
                         currVal = mf(nd, m.SerializedMove);
