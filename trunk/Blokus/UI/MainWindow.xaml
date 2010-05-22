@@ -137,6 +137,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
+                <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <Button 
                 ToolTip="Rozgrywa jedną partię między pomarańczowym a fioletowym graczem"
@@ -178,6 +179,15 @@
                     </Style>
                 </Button.Style>
             </Button>
+            <CheckBox 
+                Grid.Column="2"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Foreground="White"
+                IsChecked="{Binding SwapPlayers}" 
+                Content="Zamieniaj graczy" 
+                ToolTip="Zaznaczenie powoduje, że gracze będą zamieniani co partię miejscami podczas treningu." 
+                />
         </Grid>        
         <ComboBox 
             SelectedIndex="2"

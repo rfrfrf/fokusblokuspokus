@@ -25,8 +25,11 @@ namespace Blokus.ViewModel
         private Piece _CurrentPiece;
         private int _playedGames = 0;
         private double _orangeWins = 0.0;
-        
+        private bool _playersSwaped = false;
+
         #region Properties
+
+        public bool SwapPlayers { get; set; }
 
         public double OrangePercentageWins
         {
@@ -315,26 +318,41 @@ namespace Blokus.ViewModel
 
         private void GameTrainer(object sender, DoWorkEventArgs e)
         {
+            var orange = OrangePlayer;
+            var violet = VioletPlayer;
+            _playersSwaped = false;
+
             while (!_Worker.CancellationPending)
             {
                 if (MakeMove(false))
                 {
                     var winner = GameRules.GetWinner(GameState);
-                    if (winner == Player.Orange)
-                    {
-                        OrangeWins++;
-                    }
-                    else if (winner == Player.None)
+
+                    if (winner == Player.None)
                     {
                         OrangeWins += 0.5;
                     }
+                    else if (winner == Player.Orange)
+                    {
+                        OrangeWins++;
+                    }
+
                     IsVioletWinner = false;
                     IsOrangeWinner = false;
-                    OrangePlayer.OnGameEnd(GameState);
-                    VioletPlayer.OnGameEnd(GameState);
-                    GameState = new GameState() { OrangePlayer = this.OrangePlayer, VioletPlayer = this.VioletPlayer };
-                    OrangePlayer.OnGameStart(GameState);
-                    VioletPlayer.OnGameStart(GameState);
+                    orange.OnGameEnd(GameState);
+                    violet.OnGameEnd(GameState);
+
+                    if (SwapPlayers)
+                    {
+                        var tmp = orange;
+                        orange = violet;
+                        violet = tmp;
+                        _playersSwaped = !_playersSwaped;
+                    }
+
+                    GameState = new GameState() { OrangePlayer = orange, VioletPlayer = violet };
+                    orange.OnGameStart(GameState);
+                    violet.OnGameStart(GameState);
                     PlayedGames++;
                     NotifyPropertyChanged("OrangePercentageWins");
                 }
