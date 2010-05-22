@@ -369,9 +369,14 @@ namespace Blokus.Logic.MCTS2v2
             catch (Exception)
             {
                 _Root = new Node() { VisitCount = 1 };
-                MessageBox.Show("Nie udało się wczytać drzewa. Utworzono nowe.");
+                MessageBox.Show("MCTS2v2: Nie udało się wczytać drzewa. Utworzono nowe.");
             }
 
+        }
+
+        public override string ToString()
+        {
+            return "MCTS2v2";
         }
 
 
