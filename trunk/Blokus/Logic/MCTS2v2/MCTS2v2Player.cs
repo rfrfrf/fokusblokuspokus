@@ -105,7 +105,7 @@ namespace Blokus.Logic.MCTS2v2
                 return;
             }
             Node node = null;
-            for (int i = prevNodes.Count-2; i>=0; i--)
+            for (int i = 0; i <= prevNodes.Count - 2; i++)
             {
                 node = prevNodes.ElementAt(i);
                 ReverseOrNotR(ref R, i);
@@ -130,7 +130,7 @@ namespace Blokus.Logic.MCTS2v2
 
         private void ReverseOrNotR(ref int R, int i)
         {
-            R *= i < movesWhenOpponentBlocked ? -1 : 1;
+            R *= (prevNodes.Count - 2 - i < movesWhenOpponentBlocked) ? -1 : 1;
         }
 
         private static void CheckChildren(ref int R, Node node)
