@@ -270,7 +270,7 @@ namespace Blokus.Logic.MCTS
                 gameState.AddMove(move);
                 gameState.SwapCurrentPlayer();
 
-                result = ( 1 - _Heursitics.GetBoardEvaluation(gameState))*0.5;
+                result = 0.9 * (1.0 - _Heursitics.GetBoardEvaluation(gameState));
 
                 gameState.SwapCurrentPlayer();
                 gameState.DelMove(move);
