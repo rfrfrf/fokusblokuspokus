@@ -14,7 +14,7 @@ namespace Blokus.Logic.MCTS2v2
         public Dictionary<int, Node> Children;
         //public int AllMovesCount = -1;
         public int value = 0;
-        public Node parent;
+        //public Node parent;
 
         public bool IsLeaf { get { return Children == null || Children.Count == 0; } }
 
@@ -33,9 +33,9 @@ namespace Blokus.Logic.MCTS2v2
             }
         }
 
-        public Node(Node _parent)
+        public Node()//Node _parent)
         {
-            parent = _parent;
+            //parent = _parent;
             //Children = new Dictionary<int, Node>();
         }
 
@@ -46,7 +46,7 @@ namespace Blokus.Logic.MCTS2v2
             Children = (Dictionary<int, Node>)info.GetValue("d", typeof(Dictionary<int, Node>));
             //AllMovesCount = info.GetInt32("a");
             value = info.GetInt32("w");
-            parent = (Node)info.GetValue("p", typeof(Node));
+            //parent = (Node)info.GetValue("p", typeof(Node));
         }
 
         #region ISerializable Members
@@ -58,7 +58,7 @@ namespace Blokus.Logic.MCTS2v2
             info.AddValue("d", Children);
             //info.AddValue("a", AllMovesCount);
             info.AddValue("w", value);
-            info.AddValue("p", parent);
+            //info.AddValue("p", parent);
         }
 
         #endregion
