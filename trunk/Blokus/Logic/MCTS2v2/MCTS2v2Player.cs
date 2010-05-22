@@ -17,7 +17,7 @@ namespace Blokus.Logic.MCTS2v2
         //private Player me;
         private Random _Random = new Random();
         private delegate double MaximumFormula(Node n, int move);
-        private Node currentNode;
+        private Node currentNode, currentNodeParent;
         private ScoutPlayer simulationStrategy = new ScoutPlayer();
         private const int visitTreshhold = 1;
         private const double Cvalue = 1;
@@ -30,6 +30,7 @@ namespace Blokus.Logic.MCTS2v2
         {
             //me = gameState.OrangePlayer is MCTS2v2Player ? (gameState.VioletPlayer is MCTS2v2Player ? Player.None : Player.Orange) : Player.Violet;
             currentNode = _Root;
+            currentNodeParent = null;
             simulationStrategy.MaxDepth = 3;
             //base.OnGameStart(gameState);
         }
@@ -48,6 +49,7 @@ namespace Blokus.Logic.MCTS2v2
             {
                 if (currentNode.Children.ContainsKey(gameState.AllMoves[gameState.AllMoves.Count - 1].SerializedMove))
                 {
+                    currentNodeParent = currentNode;
                     currentNode = currentNode.Children.First(e => e.Key == gameState.AllMoves[gameState.AllMoves.Count - 1].SerializedMove).Value;
                 }
                 else
@@ -55,14 +57,15 @@ namespace Blokus.Logic.MCTS2v2
                     //albo nie ma ruchu bo nie bylo go w drzewie, albo przeciwnik jest zablokowany
                     if(lastMovesCount!=gameState.AllMoves.Count)
                     {
-                    Node pom = new Node(currentNode);
+                        currentNodeParent = currentNode;
+                    Node pom = new Node();//currentNode);
                     currentNode.Children.Add(gameState.AllMoves[gameState.AllMoves.Count - 1].SerializedMove, pom);
                     currentNode = pom;
                     }
                 }
             }
             lastMovesCount = gameState.AllMoves.Count;
-            MCTSSolver(gameState, currentNode);
+            MCTSSolver(gameState, currentNode, currentNodeParent);
             Node pomn = null;
             Move res = SelectOptimumMoveToPut(gameState, currentNode, out pomn);
             if (res != null)
@@ -79,7 +82,7 @@ namespace Blokus.Logic.MCTS2v2
 
 
 
-        private int MCTSSolver(GameState gameState, Node node)
+        private int MCTSSolver(GameState gameState, Node node, Node parent)
         {
             List<Move> moves = GameRules.GetMoves(gameState);
             if (moves.Count == 0)//czyli koniec gry, sprawdzenie kto wygrał
@@ -102,7 +105,7 @@ namespace Blokus.Logic.MCTS2v2
 
             Node bestchild;
             Move bestchildmove;
-            Select(gameState, node, out bestchild, out bestchildmove);
+            Select(gameState, node, parent, out bestchild, out bestchildmove);
             node.VisitCount++;
 
             int R = 0;
@@ -124,7 +127,7 @@ namespace Blokus.Logic.MCTS2v2
                 {
                     gameState.AddMove(bestchildmove);
                     gameState.SwapCurrentPlayer();
-                    R = -MCTSSolver(gameState, bestchild);//chyba należałoby wcześniej zmienić gameState??? czy w taki sposob
+                    R = -MCTSSolver(gameState, bestchild, node);//chyba należałoby wcześniej zmienić gameState??? czy w taki sposob
                     gameState.SwapCurrentPlayer();
                     gameState.DelMove(bestchildmove);
                 }
@@ -160,7 +163,7 @@ namespace Blokus.Logic.MCTS2v2
 
         }
 
-        private void Select(GameState gs, Node node, out Node bestchild, out Move bestchildmove)
+        private void Select(GameState gs, Node node, Node parent, out Node bestchild, out Move bestchildmove)
         {
             //Node pomNode = null;
             int pomMove = 0;
@@ -168,7 +171,7 @@ namespace Blokus.Logic.MCTS2v2
 
                 if (n.VisitCount >= visitTreshhold)
                 {
-                    return n.value + Math.Sqrt(Cvalue * Math.Log(n.parent != null ? n.parent.VisitCount : 1, Math.E) / n.VisitCount);
+                    return n.value + Math.Sqrt(Cvalue * Math.Log(parent != null ? parent.VisitCount : 1, Math.E) / n.VisitCount);
                 }
                 else
                 {
@@ -252,7 +255,7 @@ namespace Blokus.Logic.MCTS2v2
                 {
                     if(!toLook.Children.ContainsKey(m.SerializedMove))//jeśli nie zawiera
                     {
-                        Node nd = new Node(toLook);
+                        Node nd = new Node();//toLook);
                         currVal = mf(nd, m.SerializedMove);
                         if (currVal > maxVal)
                         {
@@ -293,7 +296,7 @@ namespace Blokus.Logic.MCTS2v2
             }
             catch (Exception)
             {
-                _Root = new Node(null) { VisitCount = 1 };
+                _Root = new Node() { VisitCount = 1 };
                 MessageBox.Show("Nie udało się wczytać drzewa. Utworzono nowe.");
             }
 
