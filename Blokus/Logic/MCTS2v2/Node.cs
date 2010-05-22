@@ -68,6 +68,7 @@ namespace Blokus.Logic.MCTS2v2
             if (!Children.ContainsKey(move))
             {
                 Children.Add(move, node);
+                node.VisitCount++;
             }
         }
 
