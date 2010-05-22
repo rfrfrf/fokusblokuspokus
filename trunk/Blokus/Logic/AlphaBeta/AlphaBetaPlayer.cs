@@ -39,7 +39,7 @@ namespace Blokus.Logic.AlphaBeta
 
 
         private Move _LastMove;
-        private AlphaBetaHeuristics _Heursitics = new AlphaBetaHeuristics();
+        private AlphaBetaHeuristics _Heursitics = new AlphaBetaHeuristics(true);
 
         public override Move GetMove(GameState gameState)
         {

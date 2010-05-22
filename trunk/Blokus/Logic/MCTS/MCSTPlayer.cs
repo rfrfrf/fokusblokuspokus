@@ -78,7 +78,7 @@ namespace Blokus.Logic.MCTS
         private Player _MyColor;
         private Move _LastMove;
         private Heuristics _Heursitics = new MCSTHeuristics();
-        private bool _Training = false;
+     //   private bool _Training = false;
 
         public MCSTPlayer()
         {
@@ -136,8 +136,8 @@ namespace Blokus.Logic.MCTS
                     _CurrentNode = _CurrentNode[lastMove.SerializedMove];
                     if (_CurrentNode == null) //dodaj do drzewa ruch przeciwnika
                     {
-                        var node = new Node();
-                        parent.AddChild(lastMove.SerializedMove, node);
+                        _CurrentNode = new Node();
+                        parent.AddChild(lastMove.SerializedMove, _CurrentNode);
                     }
                 }
             }
@@ -242,7 +242,7 @@ namespace Blokus.Logic.MCTS
                 {
                     var newNode = new Node();
                     node.AddChild(bestMove.SerializedMove, newNode);
-                    _CurrentNode = null; //przestan sie posuwac w drzewie, by dodac tylko jeden wierzcholek na partie
+              //      _CurrentNode = null; //przestan sie posuwac w drzewie, by dodac tylko jeden wierzcholek na partie
                 }
             }
 
@@ -253,31 +253,34 @@ namespace Blokus.Logic.MCTS
         {
             Node child;
             double result;
-            if (node != null && (child = node[move.SerializedMove]) != null) //wierzcholek jest w drzewie, uzyj wiedzy o wincount
+            if (node != null && (child = node[move.SerializedMove]) != null && child.VisitCount>4) //wierzcholek jest w drzewie, uzyj wiedzy o wincount
             {
                 if (_MyColor == Player.Orange)
                 {
-                    result = ((double)node.WinCount) / (node.VisitCount + 0.01);
+                    result = ((double)child.WinCount) / (child.VisitCount);
                 }
                 else
                 {
-                    result = ((double)(node.VisitCount - node.WinCount)) / (node.VisitCount + 0.01);
+                    result = ((double)(child.VisitCount - child.WinCount)) / (child.VisitCount);
                 }
             }
             else // wierzcholka nie ma w drzewie, uzyj heurystycznej oceny
             {
+              //  return _Random.NextDouble()*0.2;
                 gameState.AddMove(move);
                 gameState.SwapCurrentPlayer();
-                result = 2.0 - _Heursitics.GetBoardEvaluation(gameState);
+
+                result = ( 1 - _Heursitics.GetBoardEvaluation(gameState))*0.5;
+
                 gameState.SwapCurrentPlayer();
                 gameState.DelMove(move);
             }
 
-            double add = _Random.NextDouble();
+         /*   double add = _Random.NextDouble();
             add *= add;
             add *= add;
             result += add * add; //lekka nutka niedeterminizmu
-
+            */
             return result;
         }
 
