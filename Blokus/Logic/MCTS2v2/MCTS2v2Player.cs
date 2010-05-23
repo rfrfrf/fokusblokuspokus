@@ -106,19 +106,20 @@ namespace Blokus.Logic.MCTS2v2
                 return;
             }
             Node node = null;
-            for (int i = 0; i <= prevNodes.Count - 2; i++)
+            for (int i = prevNodes.Count - 2; i >= 0; i--)//od przedostatniego gdyż ostatni został zaktualizowany przed wywołaniem tej funkcji
             {
                 node = prevNodes.ElementAt(i);
-                ReverseOrNotR(ref R, i);
+                bool rev = false;
+                R = ReverseOrNotR(R, i, out rev);//nie odwracamy wtw gdy przeciwnik jest zablokowany
                 if (R == int.MaxValue)
                 {
-                    node.value = int.MinValue;
+                    node.value = rev ? int.MinValue : int.MaxValue;
                     //R *= -1;
                     continue;
                 }
                 else if (R == int.MinValue)
                 {
-                    CheckChildren(ref R, node);
+                    CheckChildren(ref R, node, rev);//ta funkcja moze zmienic R z minValue na 1 lub -1
                     //R *= -1;
                     continue;
                 }
@@ -129,23 +130,39 @@ namespace Blokus.Logic.MCTS2v2
             }
         }
 
-        private void ReverseOrNotR(ref int R, int i)
+        private int ReverseOrNotR(int R, int i, out bool rev)
         {
-            R *= (prevNodes.Count - 2 - i < movesWhenOpponentBlocked) ? -1 : 1;
+            return R = (rev = i < movesWhenOpponentBlocked) ? reversedR(R) : R;
         }
 
-        private static void CheckChildren(ref int R, Node node)
+        private int reversedR(int R)
+        {
+            if (R == int.MinValue)
+            {
+                return int.MaxValue;
+            }
+            else if (R == int.MaxValue)
+            {
+                return int.MinValue;
+            }
+            else
+            {
+                return -R;
+            }
+        }
+
+        private static void CheckChildren(ref int R, Node node, bool rev)
         {
             foreach (var c in node.Children)
             {
-                if (c.Value.value != R)
+                if (c.Value.value != int.MinValue)
                 {
-                    R = -1;
+                    R = rev ? 1 : -1;// -1;
                     node.computeAverage(R);
-                    //return R;
+                    return;// R;
                 }
             }
-            node.value = int.MaxValue;
+            node.value = rev ? int.MaxValue : int.MinValue;
             //return R;
         }
 
