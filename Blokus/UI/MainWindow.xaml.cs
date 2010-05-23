@@ -65,8 +65,11 @@ namespace Blokus.UI
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             //MultipleTree.SaveTree(MonteCarloTreeSearchPlayer.filename);
-            MCSTPlayer.SaveTree(filename2);
-            MCTS2v2Player.SaveTree(filename);
+            if (MessageBox.Show("Czy chcesz zapisać drzewka?", "Uwaga", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                MCSTPlayer.SaveTree(filename2);
+                MCTS2v2Player.SaveTree(filename);
+            }
         }
 
         private void ComboBox_Loaded(object sender, RoutedEventArgs e)
