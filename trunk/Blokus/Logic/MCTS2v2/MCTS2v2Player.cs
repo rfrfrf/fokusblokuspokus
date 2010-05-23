@@ -52,7 +52,7 @@ namespace Blokus.Logic.MCTS2v2
                 return null;
             }
 
-            //chyba źle sprawdzane, źle ustawiony root
+
             if (gameState.AllMoves.Count != 0 && currentNode != null)
             {
                 if (currentNode.Children != null && currentNode.Children.ContainsKey(gameState.AllMoves[gameState.AllMoves.Count - 1].SerializedMove))
@@ -82,7 +82,7 @@ namespace Blokus.Logic.MCTS2v2
                 }
             }
             lastMovesCount = gameState.AllMoves.Count;
-            int R = -MCTSSolver(gameState, currentNode, currentNodeParent);
+            int R = MCTSSolver(gameState, currentNode, currentNodeParent);
             BackpropagateToRoot(R);
             Node pomn = null;
             Move res = SelectOptimumMoveToPut(gameState, currentNode, out pomn);
