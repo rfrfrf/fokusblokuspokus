@@ -13,7 +13,7 @@ namespace TreeMerger
             resultTree.VisitCount += node.VisitCount;
             resultTree.WinCount += node.WinCount;
 
-            if (resultTree.AllMovesCount == -1)
+       /*     if (resultTree.AllMovesCount == -1)
             {
                 resultTree.AllMovesCount = node.AllMovesCount;
             }
@@ -23,7 +23,7 @@ namespace TreeMerger
                 {
                     throw new InvalidOperationException("Liczba ruchów w węzłach powinna się zgadzać, jeśli jest ustawiona dla obydwu węzłów");
                 }
-            }
+            }*/
             if (!node.IsLeaf)
             {
                 foreach (var child in node.Children)
