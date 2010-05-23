@@ -51,6 +51,7 @@ namespace Blokus.Logic.MCTS
                 }
                 return y.PieceVariant.Squares.Length.CompareTo(x.PieceVariant.Squares.Length) * multiplier;
             });
+            AlphaBeta.AlphaBetaHeuristics.Randomize(moves);
         }
     
     }
