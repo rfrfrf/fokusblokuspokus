@@ -17,7 +17,7 @@ namespace Blokus.Logic.MCTS
         public int VisitCount = 0;
         public int WinCount = 0;
         public Dictionary<int, Node> Children;
-        public int AllMovesCount = -1;
+      //  public int AllMovesCount = -1;
 
         public bool IsLeaf { get { return Children == null || Children.Count == 0; } }
 
@@ -43,7 +43,7 @@ namespace Blokus.Logic.MCTS
             VisitCount = info.GetInt32("v");
             WinCount = info.GetInt32("w");
             Children = (Dictionary<int, Node>)info.GetValue("d", typeof(Dictionary<int, Node>));
-            AllMovesCount = info.GetInt32("a");
+      //      AllMovesCount = info.GetInt32("a");
         }
 
         #region ISerializable Members
@@ -53,7 +53,7 @@ namespace Blokus.Logic.MCTS
             info.AddValue("v", VisitCount);
             info.AddValue("w", WinCount);
             info.AddValue("d", Children);
-            info.AddValue("a", AllMovesCount);
+   //         info.AddValue("a", AllMovesCount);
         }
 
         #endregion
@@ -155,7 +155,14 @@ namespace Blokus.Logic.MCTS
         {
             /*if (!_Training)*/
             {
-                int result = GameRules.GetWinner(gameState) == Player.Orange ? 1 : 0;
+                var winner = GameRules.GetWinner(gameState);
+                int result = 0;
+                switch (winner)
+                {
+                    case Player.None: result = 0; break;
+                    case Player.Orange: result = 1; break;
+                    case Player.Violet: result = -1; break;
+                }
 
                 var node = _Root;
 
@@ -163,6 +170,7 @@ namespace Blokus.Logic.MCTS
                 {
                     node.VisitCount++;
                     node.WinCount += result;
+                    result *= -1;
                     node = node[move.SerializedMove];
                     if (node == null)
                     {
@@ -197,20 +205,29 @@ namespace Blokus.Logic.MCTS
                 if (node != null && _LastMove!=null)
                 {
                     node.AddChild(_LastMove.SerializedMove, new Node());
+                    _CurrentNode = null;
                 }
                 return;
             }
 
-            var moveslist = GameRules.GetMoves(gameState, MaxTreeRank); //pobierz MaxTreeRank pierwszych dostepnych ruchow
-
+            int rank = Math.Max(40, MaxTreeRank);
+            var moveslist = GameRules.GetMoves(gameState, rank); //pobierz MaxTreeRank pierwszych dostepnych ruchow
+            
             if (moveslist.Count == 0)
             {
                 return; // pozycja koncowa
             }
 
+            _Heursitics.SortMoves(gameState, moveslist);
+            int i=0;
             foreach (var n in moveslist)
             {
                 moves.Add(n);
+                i++;
+                if (i > MaxTreeRank)
+                {
+                    break;
+                }
             }
 
             if (nodeChildren != null)
@@ -229,7 +246,7 @@ namespace Blokus.Logic.MCTS
 
             foreach (var move in moves)
             {
-                double eval = EvaluateMove(move, gameState, node);
+                double eval = -EvaluateMove(move, gameState, node);
                 if (eval > maxEval)
                 {
                     bestMove = move;
@@ -242,7 +259,7 @@ namespace Blokus.Logic.MCTS
                 {
                     var newNode = new Node();
                     node.AddChild(bestMove.SerializedMove, newNode);
-              //      _CurrentNode = null; //przestan sie posuwac w drzewie, by dodac tylko jeden wierzcholek na partie
+                    _CurrentNode = null; //przestan sie posuwac w drzewie, by dodac tylko jeden wierzcholek na partie
                 }
             }
 
@@ -253,34 +270,37 @@ namespace Blokus.Logic.MCTS
         {
             Node child;
             double result;
-            if (node != null && (child = node[move.SerializedMove]) != null && child.VisitCount>4) //wierzcholek jest w drzewie, uzyj wiedzy o wincount
+            if (node != null && (child = node[move.SerializedMove]) != null && child.VisitCount>6) //wierzcholek jest w drzewie, uzyj wiedzy o wincount
             {
-                if (_MyColor == Player.Orange)
+                result = child.WinCount;
+             /*   if (_MyColor == Player.Orange)
                 {
                     result = ((double)child.WinCount) / (child.VisitCount);
                 }
                 else
                 {
                     result = ((double)(child.VisitCount - child.WinCount)) / (child.VisitCount);
-                }
+                }*/
+               // result = Math.Pow(result, Math.Log(child.VisitCount));
             }
             else // wierzcholka nie ma w drzewie, uzyj heurystycznej oceny
             {
-              //  return _Random.NextDouble()*0.2;
+               // return _Random.NextDouble()*0.5;
                 gameState.AddMove(move);
                 gameState.SwapCurrentPlayer();
 
-                result = 0.9 * (1.0 - _Heursitics.GetBoardEvaluation(gameState));
+                result =  _Heursitics.GetBoardEvaluation(gameState);
 
                 gameState.SwapCurrentPlayer();
                 gameState.DelMove(move);
             }
 
-         /*   double add = _Random.NextDouble();
+            double add = _Random.NextDouble()*0.5;
             add *= add;
             add *= add;
-            result += add * add; //lekka nutka niedeterminizmu
-            */
+            add *= add;
+            result *=  1.0 + add * add; //lekka nutka niedeterminizmu
+            
             return result;
         }
 

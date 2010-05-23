@@ -8,7 +8,7 @@ namespace Blokus.Logic.AlphaBeta
     class AlphaBetaHeuristics : Heuristics
     {
         private bool nonDeterministic = false;
-        private Random _Random = new Random();
+        private static Random _Random = new Random();
 
         public AlphaBetaHeuristics()
         {
@@ -25,7 +25,6 @@ namespace Blokus.Logic.AlphaBeta
             if (nonDeterministic)
             {
                 add = _Random.NextDouble();
-                add *= add;
                 add *= add;
                 add *= add;
             }
@@ -87,6 +86,23 @@ namespace Blokus.Logic.AlphaBeta
                 }
                 return y.Variants[0].Squares.Length.CompareTo(x.Variants[0].Squares.Length);
             });
+            if (nonDeterministic)
+            {
+                Randomize(gameState.CurrentPlayerHand.HandPieces);
+            }
+        }
+
+        public static void Randomize<T>(IList<T> list)
+        {
+            for (int i = 0; i < list.Count / 5; i++)
+            {
+                int a = _Random.Next(list.Count);
+                int b = _Random.Next(list.Count);
+
+                var tmp = list[a];
+                list[a] = list[b];
+                list[b] = tmp;
+            }
         }
 
         /// <summary>
@@ -100,7 +116,7 @@ namespace Blokus.Logic.AlphaBeta
             int multiplier = gameState.CurrentPlayerColor == Player.Violet ? 1 : -1;
             moves.Sort((x, y) =>
             {
-                int a = x.Position.X + x.Position.Y;
+                int a = x.Position.X + x.Position.Y;                
                 int b = y.Position.X + y.Position.Y;
                 if (a != b)
                 {
@@ -108,6 +124,10 @@ namespace Blokus.Logic.AlphaBeta
                 }
                 return y.PieceVariant.Squares.Length.CompareTo(x.PieceVariant.Squares.Length) * multiplier;
             });
+            if (nonDeterministic)
+            {
+                Randomize(moves);
+            }
         }
         /*
         /// <summary>
