@@ -183,7 +183,7 @@
                 Grid.Column="2"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
-                Foreground="White"
+                Foreground="Blue"
                 IsChecked="{Binding SwapPlayers}" 
                 Content="Zamieniaj graczy" 
                 ToolTip="Zaznaczenie powoduje, że gracze będą zamieniani co partię miejscami podczas treningu." 

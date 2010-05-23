@@ -29,7 +29,7 @@ namespace Blokus.ViewModel
 
         #region Properties
 
-        public bool SwapPlayers { get; set; }
+        public bool SwapPlayers {get; set; }
 
         public double OrangePercentageWins
         {
