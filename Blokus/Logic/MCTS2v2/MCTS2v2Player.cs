@@ -19,7 +19,7 @@ namespace Blokus.Logic.MCTS2v2
         private delegate double MaximumFormula(Node n, int move);
         private Node currentNode, currentNodeParent;
         private ScoutPlayer simulationStrategy = new ScoutPlayer();
-        private const int visitTreshhold = 100;
+        private const int visitTreshhold = 10;
         private const double Cvalue = 1;
 
         private const double Avalue = 1;
@@ -34,7 +34,8 @@ namespace Blokus.Logic.MCTS2v2
             //me = gameState.OrangePlayer is MCTS2v2Player ? (gameState.VioletPlayer is MCTS2v2Player ? Player.None : Player.Orange) : Player.Violet;
             currentNode = _Root;
             currentNodeParent = null;
-            simulationStrategy.MaxDepth = 3;
+            simulationStrategy.MaxDepth = 1;
+            simulationStrategy.MaxTreeRank = 1;
             prevNodes = new List<Node>();
             prevNodes.Add(currentNode);
             movesWhenOpponentBlocked = int.MaxValue;
@@ -258,11 +259,11 @@ namespace Blokus.Logic.MCTS2v2
 
                 if (n.VisitCount >= visitTreshhold)
                 {
-                    return n.value + Math.Sqrt(Cvalue * Math.Log(parent != null ? parent.VisitCount : 1, Math.E) / n.VisitCount);
+                    return (n.value + Math.Sqrt(Cvalue * Math.Log(parent != null ? parent.VisitCount : 1, Math.E) / n.VisitCount));
                 }
                 else
                 {
-                    return 0;
+                    return 0;// PlaySimulatedGame(gs);//0;
                 }
 
 
@@ -283,7 +284,7 @@ namespace Blokus.Logic.MCTS2v2
         {
             //Node pomNode=null;
             int pommove = 0;
-            FindMaximizedNode(null, currentNode, (node, move) => { return node.value + Avalue / Math.Sqrt(node.VisitCount); }, out nextNode, out pommove);
+            FindMaximizedNode(null, currentNode, (node, move) => { return (node.value + Avalue / Math.Sqrt(node.VisitCount)); }, out nextNode, out pommove);
             return pommove != 0 ? new Move(pommove) : null;
         }
 
