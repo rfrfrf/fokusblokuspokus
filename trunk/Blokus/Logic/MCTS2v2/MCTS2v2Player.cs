@@ -12,11 +12,11 @@ namespace Blokus.Logic.MCTS2v2
     [Serializable]
     public class MCTS2v2Player : AIPlayer
     {
-        Heuristics heuristics = new AlphaBeta.AlphaBetaHeuristics();
+        Heuristics heuristics = new Scout.ScoutHeuristics();
         private static Node _Root;
         //private Player me;
         private Random _Random = new Random();
-        private delegate double MaximumFormula(Node n, int move);
+        private delegate double MaximumFormula(Node n, int move, GameState gameState);
         private Node currentNode, currentNodeParent;
         private ScoutPlayer simulationStrategy = new ScoutPlayer();
         private const int visitTreshhold = 5;
@@ -180,7 +180,9 @@ namespace Blokus.Logic.MCTS2v2
 
         private int MCTSSolver(GameState gameState, Node node, Node parent)
         {
+            heuristics.SortHand(gameState);
             List<Move> moves = GameRules.GetMoves(gameState);
+            heuristics.SortMoves(gameState, moves);
             if (moves.Count == 0)//czyli koniec gry, sprawdzenie kto wygrał
             {
                 var p = GameRules.GetGameResult(gameState); 
@@ -276,7 +278,7 @@ namespace Blokus.Logic.MCTS2v2
         {
             //Node pomNode = null;
             int pomMove = 0;
-            FindMaximizedNode(gs, node, (n, move) =>
+            FindMaximizedNode(gs, node, (n, move, gameState) =>
             {
 
                 if (n.VisitCount >= visitTreshhold)
@@ -285,7 +287,14 @@ namespace Blokus.Logic.MCTS2v2
                 }
                 else
                 {
-                    return 0;// PlaySimulatedGame(gs);//0;
+                    gameState.AddMove(new Move(move));
+                    gameState.SwapCurrentPlayer();
+
+                    var result = heuristics.GetBoardEvaluation(gameState);
+
+                    gameState.SwapCurrentPlayer();
+                    gameState.DelMove(new Move(move));
+                    return result;
                 }
 
 
@@ -306,7 +315,7 @@ namespace Blokus.Logic.MCTS2v2
         {
             //Node pomNode=null;
             int pommove = 0;
-            FindMaximizedNode(null, currentNode, (node, move) => { return (node.value + Avalue / Math.Sqrt(node.VisitCount)); }, out nextNode, out pommove, null);
+            FindMaximizedNode(null, currentNode, (node, move, gs) => { return (node.value + Avalue / Math.Sqrt(node.VisitCount)); }, out nextNode, out pommove, null);
             return pommove != 0 ? new Move(pommove) : null;
         }
 
@@ -351,7 +360,7 @@ namespace Blokus.Logic.MCTS2v2
             {
                 foreach (var d in toLook.Children)
                 {
-                    currVal = mf(d.Value, d.Key);
+                    currVal = mf(d.Value, d.Key, gs);
                     if (currVal > maxVal)
                     {
                         maxVal = currVal;
@@ -360,7 +369,7 @@ namespace Blokus.Logic.MCTS2v2
                     }
                 }
             }
-            if (gs != null && maxVal<0) //jak nie jest ujemne to i tak nic nie znajdzie
+            if (gs != null )//&& maxVal<0) //jak nie jest ujemne to i tak nic nie znajdzie
             {
                 if (moves == null)
                 {
@@ -375,13 +384,13 @@ namespace Blokus.Logic.MCTS2v2
                     if (toLook.Children == null || !toLook.Children.ContainsKey(m.SerializedMove))//jeśli nie zawiera
                     {
                         Node nd = new Node();//toLook);
-                        currVal = 0.0;// -mf(nd, m.SerializedMove); i tak zwraca zero
+                        currVal =  -mf(nd, m.SerializedMove, gs);// i tak zwraca zero
                         if (currVal > maxVal)
                         {
                             maxVal = currVal;
                             n = nd;
                             move = m.SerializedMove;
-                            break; //i tak nie znajdzie niczego większego
+                         //   break; //i tak nie znajdzie niczego większego
                         }
                     }
                 }

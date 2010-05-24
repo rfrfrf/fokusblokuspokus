@@ -123,6 +123,10 @@ namespace Blokus.UI
                 int variantY = e.PiecePosition.Y / PieceSizeY;
 
                 int ind = variantX + variantY * PieceCountX;
+                if (ind >= Hand.HandPieces.Count)
+                {
+                    return;
+                }
                 Click(this, new HandClickEventArgs(Hand.HandPieces[ind]));
             }
         }
