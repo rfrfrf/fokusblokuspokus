@@ -80,6 +80,7 @@ namespace Blokus.UI
         private void ComboBox_Loaded_1(object sender, RoutedEventArgs e)
         {
             ((ComboBox)sender).SelectedIndex = 2;
+            ((Blokus.Logic.Scout.ScoutPlayer)((ComboBox)sender).SelectedValue)._Heursitics = new Blokus.Logic.AlphaBeta.AlphaBetaHeuristics(true);
         }
     }
 }
