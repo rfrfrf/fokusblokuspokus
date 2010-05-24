@@ -265,6 +265,10 @@ namespace Blokus.Logic.MCTS2v2
 
             if (R == int.MaxValue)
             {
+                if (moves.Count != node.Children.Count)
+                {
+                    return 1;
+                }
                 //node.value = int.MinValue;
                 return R;
             }
