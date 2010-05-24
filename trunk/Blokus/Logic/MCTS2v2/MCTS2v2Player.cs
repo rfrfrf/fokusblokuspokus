@@ -82,8 +82,9 @@ namespace Blokus.Logic.MCTS2v2
                     }
                 }
             }
+            //currentNode ostatni na liscie prevNodes
             lastMovesCount = gameState.AllMoves.Count;
-            int R = MCTSSolver(gameState, currentNode, currentNodeParent);
+            int R = MCTSSolver(gameState, currentNode, currentNodeParent);//teraz currentNode nie jest zaktualizowany
             BackpropagateToRoot(R);
             Node pomn = null;
             Move res = SelectOptimumMoveToPut(gameState, currentNode, out pomn);
@@ -102,38 +103,46 @@ namespace Blokus.Logic.MCTS2v2
 
         private void BackpropagateToRoot(int R)
         {
-            if (prevNodes.Count <= 1)
+            if (prevNodes.Count <= 0)
             {
                 return;
             }
             Node node = null;
-            for (int i = prevNodes.Count - 2; i >= 0; i--)//od przedostatniego gdyż ostatni został zaktualizowany przed wywołaniem tej funkcji
+            for (int i = prevNodes.Count - 1; i > 0; i--)//od --przed--ostatniego gdyż ostatni został zaktualizowany przed wywołaniem tej funkcji
             {
                 node = prevNodes.ElementAt(i);
+                //teraz aktualizacja!!!
+                node.computeAverage(R);
+
+                //if (R == int.MaxValue)
+                //{
+                //    node.value = rev ? int.MinValue : int.MaxValue;
+                //    //R *= -1;
+                //    continue;
+                //}
+                //else if (R == int.MinValue)
+                //{
+                //    CheckChildren(ref R, node, rev);//ta funkcja moze zmienic R z minValue na 1 lub -1
+                //    //R *= -1;
+                //    continue;
+                //}
+
+                //node.computeAverage(R);
+                ////R *= -1;
+                ////continue;
+
+
+
+
                 bool rev = false;
                 R = ReverseOrNotR(R, i, out rev);//nie odwracamy wtw gdy przeciwnik jest zablokowany
-                if (R == int.MaxValue)
-                {
-                    node.value = rev ? int.MinValue : int.MaxValue;
-                    //R *= -1;
-                    continue;
-                }
-                else if (R == int.MinValue)
-                {
-                    CheckChildren(ref R, node, rev);//ta funkcja moze zmienic R z minValue na 1 lub -1
-                    //R *= -1;
-                    continue;
-                }
-
-                node.computeAverage(R);
-                //R *= -1;
-                continue;
+                
             }
         }
 
         private int ReverseOrNotR(int R, int i, out bool rev)
         {
-            return R = (rev = i < movesWhenOpponentBlocked) ? reversedR(R) : R;
+            return R = (rev = i < movesWhenOpponentBlocked-1) ? reversedR(R) : R;
         }
 
         private int reversedR(int R)
@@ -174,12 +183,12 @@ namespace Blokus.Logic.MCTS2v2
             List<Move> moves = GameRules.GetMoves(gameState);
             if (moves.Count == 0)//czyli koniec gry, sprawdzenie kto wygrał
             {
-                Player p = GameRules.GetWinner(gameState);
-                if (p == Player.None)//remis
+                var p = GameRules.GetGameResult(gameState); 
+                if (p == 0)//remis
                 {
                     return 0;
                 }
-                else if (p == gameState.CurrentPlayerColor)//ja wygralem
+                else if (p == 1)//ja wygralem
                 {
                     return int.MaxValue;
                 }
@@ -204,17 +213,21 @@ namespace Blokus.Logic.MCTS2v2
                     gameState.AddMove(bestchildmove);
                     gameState.SwapCurrentPlayer();
                     R = -PlaySimulatedGame(gameState); //być może bez minusa
+                    //zakladamy, ze R z perspektywy node'a
                     gameState.SwapCurrentPlayer();
                     gameState.DelMove(bestchildmove);
                     node.AddChild(bestchildmove.SerializedMove, bestchild);
-                    node.computeAverage(R);
+                    //node.computeAverage(R);
+                    bestchild.computeAverage(R);
+                    bestchild.VisitCount++;
                     return R;
                 }
                 else
                 {
                     gameState.AddMove(bestchildmove);
                     gameState.SwapCurrentPlayer();
-                    R = -MCTSSolver(gameState, bestchild, node);//chyba należałoby wcześniej zmienić gameState??? czy w taki sposob
+                    R = reversedR(MCTSSolver(gameState, bestchild, node));//chyba należałoby wcześniej zmienić gameState??? czy w taki sposob
+                    //R z perspktywy node'a
                     gameState.SwapCurrentPlayer();
                     gameState.DelMove(bestchildmove);
                 }
@@ -222,29 +235,38 @@ namespace Blokus.Logic.MCTS2v2
             else
             {
                 R = bestchild.value;
+                //R z perspektywy node'a
             }
+
+            //R z perspektywy node'a
+
 
             if (R == int.MaxValue)
             {
-                node.value = int.MinValue;
+                //node.value = int.MinValue;
                 return R;
             }
             else if (R == int.MinValue)
             {
-                foreach (var c in node.Children)
+                if (moves.Count != node.Children.Count)
                 {
-                    if (c.Value.value != R)
-                    {
-                        R = -1;
-                        node.computeAverage(R);
-                        return R;
-                    }
+                    return -1;
                 }
-                node.value = int.MaxValue;
+                    foreach (var c in node.Children)
+                    {
+                        if (c.Value.value != R)
+                        {
+                            R = -1;
+                            //node.computeAverage(R);
+                            return R;
+                        }
+                    }
+                
+                //node.value = int.MaxValue;
                 return R;
             }
 
-            node.computeAverage(R);
+            //node.computeAverage(R);
             return R;
 
 
@@ -307,8 +329,7 @@ namespace Blokus.Logic.MCTS2v2
                 state.AddMove(move);
                 state.SwapCurrentPlayer();
             }
-            Player winner = GameRules.GetWinner(state);
-            return winner == player ? 1 : (winner == Player.None ? 0 : -1);
+            return (int)GameRules.GetGameResult(state);
         }
 
 
