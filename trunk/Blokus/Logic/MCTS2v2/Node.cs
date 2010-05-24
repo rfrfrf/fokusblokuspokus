@@ -84,7 +84,10 @@ namespace Blokus.Logic.MCTS2v2
             }
             else
             {
-                value += R;
+                if ((R > 0 && value < int.MaxValue) || (R < 0 && value > int.MinValue))
+                {
+                    value += R;
+                }
             }
         }
     }
