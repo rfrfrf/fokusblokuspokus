@@ -239,7 +239,8 @@ namespace Blokus.ViewModel
         /// <returns>Zwraca czy gra się zakonczyla</returns>
         private bool MakeMove(bool updateLayout) 
         {
-            Move move = CurrentPlayer.GetMove(GameState);
+            var player = GameState.CurrentPlayerColor == Player.Orange ? GameState.OrangePlayer : GameState.VioletPlayer;
+            Move move = player.GetMove(GameState);
             if (move != null)
             {
                 GameState.AddMove(move);
@@ -332,7 +333,7 @@ namespace Blokus.ViewModel
                     {
                         OrangeWins += 0.5;
                     }
-                    else if (winner == Player.Orange)
+                    else if (winner == Player.Orange ^ _playersSwaped)
                     {
                         OrangeWins++;
                     }
