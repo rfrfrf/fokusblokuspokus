@@ -6,9 +6,9 @@ using Blokus.Logic.AlphaBeta;
 using System.Runtime.Serialization;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using Blokus.Logic.MonteCarloTreeSearch;
 using System.Windows;
 using Blokus.Logic.Scout;
+using Blokus.Logic.Heuristics;
 
 namespace Blokus.Logic.MCTS
 {
@@ -78,8 +78,18 @@ namespace Blokus.Logic.MCTS
         private Node _CurrentNode;
         private Player _MyColor;
         private Move _LastMove;
-        private Heuristics _Heursitics = new ScoutHeuristics(true);
+        private HeuristicsBase _Heursitics;
      //   private bool _Training = false;
+
+        public override HeuristicsBase Heuristics
+        {
+            get { return _Heursitics; }
+            set 
+            { 
+                _Heursitics = value;
+                _Playouter.Heuristics = value;
+            }
+        }
 
         public MCSTPlayer()
         {

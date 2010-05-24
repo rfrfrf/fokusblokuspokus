@@ -6,23 +6,30 @@
     xmlns:logic="clr-namespace:Blokus.Logic"
     xmlns:logicAlphaBeta="clr-namespace:Blokus.Logic.AlphaBeta"
     xmlns:logicScout="clr-namespace:Blokus.Logic.Scout"
-    xmlns:logicMonte="clr-namespace:Blokus.Logic.MonteCarloTreeSearch"
     xmlns:logicMcts="clr-namespace:Blokus.Logic.MCTS"
     xmlns:logicMcts2="clr-namespace:Blokus.Logic.MCTS2v2"
     xmlns:logicRandom="clr-namespace:Blokus.Logic.RandomPlayer"
+    xmlns:logicHeuristics="clr-namespace:Blokus.Logic.Heuristics"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     Title="Blokus Duo" 
     Closing="Window_Closing"
     MouseWheel="Window_MouseWheel" 
-    Height="602" Width="729"    
+    Height="677" Width="729"    
     Background="#162640"
     >
     <Window.Resources>
+        <x:Array Type="{x:Type logicHeuristics:HeuristicsBase}" x:Key="orangeHeuristicsDataSource">
+            <logicHeuristics:NaiveHeuristics/>
+            <logicHeuristics:EpicHeuristics/>
+        </x:Array>
+        <x:Array Type="{x:Type logicHeuristics:HeuristicsBase}" x:Key="violetHeuristicsDataSource">
+            <logicHeuristics:NaiveHeuristics/>
+            <logicHeuristics:EpicHeuristics/>
+        </x:Array>
         <x:Array Type="{x:Type logic:PlayerBase}" x:Key="orangePlayersDataSource">
             <logic:HumanPlayer />
             <logicAlphaBeta:AlphaBetaPlayer />
             <logicScout:ScoutPlayer />
-            <!--<logicMonte:MonteCarloTreeSearchPlayer />-->
             <logicMcts:MCSTPlayer />
             <logicMcts2:MCTS2v2Player />
             <logicRandom:RandomPlayer />
@@ -31,11 +38,13 @@
             <logic:HumanPlayer />
             <logicAlphaBeta:AlphaBetaPlayer />
             <logicScout:ScoutPlayer />
-            <!--<logicMonte:MonteCarloTreeSearchPlayer />-->
             <logicMcts:MCSTPlayer />
             <logicMcts2:MCTS2v2Player />
             <logicRandom:RandomPlayer />
         </x:Array>
+        <Style TargetType="CheckBox">
+            <Setter Property="TextBlock.Foreground" Value="White"/>
+        </Style>
         <Style TargetType="{x:Type TextBlock}" >
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="Margin" Value="2" />
@@ -67,6 +76,8 @@
         </Grid.Background>
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
+            <RowDefinition Height="28"/>
+            <RowDefinition Height="28"/>
             <RowDefinition Height="28"/>
             <RowDefinition Height="350"/>
             <RowDefinition Height="Auto"/>
@@ -134,6 +145,19 @@
             Grid.Row="1"
             ItemsSource="{Binding Source={StaticResource orangePlayersDataSource}}" 
             SelectedValue="{Binding OrangePlayer}" Loaded="ComboBox_Loaded" />
+        <ComboBox                    
+            Margin="2"
+            Grid.Row="2"
+            ItemsSource="{Binding Source={StaticResource orangeHeuristicsDataSource}}" 
+            SelectedValue="{Binding OrangeHeuristics}" Loaded="heuristicsComboBox_Loaded" />
+        <CheckBox 
+            Grid.Row="3"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+            IsChecked="{Binding OrangeHeuristics.IsNonDeterministic}" 
+            Content="Niedeterminizm" 
+            ToolTip="Zaznaczenie powoduje, że heurystyka pomarańczowego gracza jest niedeterministyczna." 
+            />
         <Grid                 
             Grid.Row="1"
             Grid.Column="1">
@@ -186,7 +210,6 @@
                 Grid.Column="2"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
-                Foreground="Blue"
                 IsChecked="{Binding SwapPlayers}" 
                 Content="Zamieniaj graczy" 
                 ToolTip="Zaznaczenie powoduje, że gracze będą zamieniani co partię miejscami podczas treningu." 
@@ -199,8 +222,23 @@
             Grid.Column="2"
             ItemsSource="{Binding Source={StaticResource violetPlayersDataSource}}" 
             SelectedValue="{Binding VioletPlayer}" Loaded="ComboBox_Loaded_1" />
+        <ComboBox                    
+            Margin="2"
+            Grid.Row="2"
+            Grid.Column="2"
+            ItemsSource="{Binding Source={StaticResource violetHeuristicsDataSource}}" 
+            SelectedValue="{Binding VioletHeuristics}" Loaded="heuristicsComboBox_Loaded" />
+        <CheckBox 
+            Grid.Row="3"
+            Grid.Column="2"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+            IsChecked="{Binding VioletHeuristics.IsNonDeterministic}" 
+            Content="Niedeterminizm" 
+            ToolTip="Zaznaczenie powoduje, że heurystyka fioletowego gracza jest niedeterministyczna." 
+            />
         <Border
-            Grid.Row="2" 
+            Grid.Row="4" 
             BorderBrush="LimeGreen"
             CornerRadius="8"
             >
@@ -242,7 +280,7 @@
         <Grid  
             x:Name="BoardGrid"
             Grid.Column="1"
-            Grid.Row="2" 
+            Grid.Row="4" 
             Width="308"
             Height="308"
             MouseMove="Grid_MouseMove"
@@ -259,7 +297,7 @@
             </Canvas>
         </Grid>
         <Border
-            Grid.Row="2" 
+            Grid.Row="4" 
             Grid.Column="2" 
             BorderBrush="LimeGreen"
             CornerRadius="8"
@@ -299,7 +337,7 @@
                 </Style>
             </Border.Style>
         </Border>
-        <Grid Grid.ColumnSpan="3" Grid.Row="3">
+        <Grid Grid.ColumnSpan="3" Grid.Row="5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>

@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Blokus.Logic.Heuristics;
 
 namespace Blokus.Logic.RandomPlayer
 {
     class RandomPlayer:AIPlayer
     {
         private Random _Random = new Random();
+
+        public override HeuristicsBase Heuristics { get; set; }
 
         public override Move GetMove(GameState gameState)
         {
