@@ -9,6 +9,7 @@
     xmlns:logicMonte="clr-namespace:Blokus.Logic.MonteCarloTreeSearch"
     xmlns:logicMcts="clr-namespace:Blokus.Logic.MCTS"
     xmlns:logicMcts2="clr-namespace:Blokus.Logic.MCTS2v2"
+    xmlns:logicRandom="clr-namespace:Blokus.Logic.RandomPlayer"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
     Title="Blokus Duo" 
     Closing="Window_Closing"
@@ -24,6 +25,7 @@
             <!--<logicMonte:MonteCarloTreeSearchPlayer />-->
             <logicMcts:MCSTPlayer />
             <logicMcts2:MCTS2v2Player />
+            <logicRandom:RandomPlayer />
         </x:Array>
         <x:Array Type="{x:Type logic:PlayerBase}" x:Key="violetPlayersDataSource">
             <logic:HumanPlayer />
@@ -32,6 +34,7 @@
             <!--<logicMonte:MonteCarloTreeSearchPlayer />-->
             <logicMcts:MCSTPlayer />
             <logicMcts2:MCTS2v2Player />
+            <logicRandom:RandomPlayer />
         </x:Array>
         <Style TargetType="{x:Type TextBlock}" >
             <Setter Property="Foreground" Value="White"/>

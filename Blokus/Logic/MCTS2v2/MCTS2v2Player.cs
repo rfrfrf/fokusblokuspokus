@@ -201,7 +201,7 @@ namespace Blokus.Logic.MCTS2v2
 
             Node bestchild;
             Move bestchildmove;
-            Select(gameState, node, parent, out bestchild, out bestchildmove);
+            Select(gameState, node, parent, out bestchild, out bestchildmove, moves);
             node.VisitCount++;
 
             int R = 0;
@@ -272,7 +272,7 @@ namespace Blokus.Logic.MCTS2v2
 
         }
 
-        private void Select(GameState gs, Node node, Node parent, out Node bestchild, out Move bestchildmove)
+        private void Select(GameState gs, Node node, Node parent, out Node bestchild, out Move bestchildmove, List<Move> moves)
         {
             //Node pomNode = null;
             int pomMove = 0;
@@ -293,7 +293,7 @@ namespace Blokus.Logic.MCTS2v2
             }
 
 
-                , out bestchild, out pomMove);
+                , out bestchild, out pomMove, moves);
             bestchildmove = new Move(pomMove);
         }
 
@@ -306,7 +306,7 @@ namespace Blokus.Logic.MCTS2v2
         {
             //Node pomNode=null;
             int pommove = 0;
-            FindMaximizedNode(null, currentNode, (node, move) => { return (node.value + Avalue / Math.Sqrt(node.VisitCount)); }, out nextNode, out pommove);
+            FindMaximizedNode(null, currentNode, (node, move) => { return (node.value + Avalue / Math.Sqrt(node.VisitCount)); }, out nextNode, out pommove, null);
             return pommove != 0 ? new Move(pommove) : null;
         }
 
@@ -342,7 +342,7 @@ namespace Blokus.Logic.MCTS2v2
         /// <param name="mf"></param>
         /// <param name="n"></param>
         /// <param name="move"></param>
-        private void FindMaximizedNode(GameState gs, Node toLook, MaximumFormula mf, out Node n, out int move)
+        private void FindMaximizedNode(GameState gs, Node toLook, MaximumFormula mf, out Node n, out int move, List<Move> moves)
         {
             double maxVal = double.NegativeInfinity, currVal = double.NegativeInfinity;
             n = null;
@@ -362,9 +362,14 @@ namespace Blokus.Logic.MCTS2v2
             }
             if (gs != null && maxVal<0) //jak nie jest ujemne to i tak nic nie znajdzie
             {
-                heuristics.SortHand(gs);
-                List<Move> moves = GameRules.GetMoves(gs);
-                heuristics.SortMoves(gs, moves);
+                if (moves == null)
+                {
+                    moves = GameRules.GetMoves(gs);
+                }
+                if (toLook.Children != null && toLook.Children.Count == moves.Count)
+                {
+                    return;
+                }
                 foreach (Move m in moves)
                 {
                     if (toLook.Children == null || !toLook.Children.ContainsKey(m.SerializedMove))//jeśli nie zawiera
