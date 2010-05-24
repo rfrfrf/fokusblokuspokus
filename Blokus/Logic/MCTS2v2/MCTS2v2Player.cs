@@ -12,14 +12,14 @@ namespace Blokus.Logic.MCTS2v2
     [Serializable]
     public class MCTS2v2Player : AIPlayer
     {
-
+        Heuristics heuristics = new AlphaBeta.AlphaBetaHeuristics();
         private static Node _Root;
         //private Player me;
         private Random _Random = new Random();
         private delegate double MaximumFormula(Node n, int move);
         private Node currentNode, currentNodeParent;
         private ScoutPlayer simulationStrategy = new ScoutPlayer();
-        private const int visitTreshhold = 10;
+        private const int visitTreshhold = 5;
         private const double Cvalue = 1;
 
         private const double Avalue = 1;
@@ -339,26 +339,29 @@ namespace Blokus.Logic.MCTS2v2
                     }
                 }
             }
-            if (gs != null)
+            if (gs != null && maxVal<0) //jak nie jest ujemne to i tak nic nie znajdzie
             {
+                heuristics.SortHand(gs);
                 List<Move> moves = GameRules.GetMoves(gs);
+                heuristics.SortMoves(gs, moves);
                 foreach (Move m in moves)
                 {
                     if (toLook.Children == null || !toLook.Children.ContainsKey(m.SerializedMove))//jeśli nie zawiera
                     {
                         Node nd = new Node();//toLook);
-                        currVal = mf(nd, m.SerializedMove);
+                        currVal = 0.0;// -mf(nd, m.SerializedMove); i tak zwraca zero
                         if (currVal > maxVal)
                         {
                             maxVal = currVal;
                             n = nd;
                             move = m.SerializedMove;
+                            break; //i tak nie znajdzie niczego większego
                         }
                     }
                 }
             }
 
-
+            
         }
 
 
