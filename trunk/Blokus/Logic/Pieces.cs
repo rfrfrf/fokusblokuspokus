@@ -316,7 +316,7 @@ namespace Blokus.Logic
             }
         }
 
-        //*
+        // *
         //***
         // *
         public static Piece Pentamino12
