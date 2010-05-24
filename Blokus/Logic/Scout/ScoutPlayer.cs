@@ -3,15 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Blokus.Logic.AlphaBeta;
+using Blokus.Logic.Heuristics;
 
 namespace Blokus.Logic.Scout
 {
     class ScoutPlayer : AIPlayer
     {
-        public Heuristics _Heursitics = new ScoutHeuristics(true);
+        private HeuristicsBase _Heursitics;
         private Move _LastMove;
-        private int _MaxDepth = 1;
-        private int _MaxTreeRank = 1;
+        private int _MaxDepth = 2;
+        private int _MaxTreeRank = 5;
+
+        public override HeuristicsBase Heuristics
+        {
+            get { return _Heursitics; }
+            set { _Heursitics = value; }
+        }
 
         public int MaxDepth
         {

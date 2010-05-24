@@ -3,15 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Blokus.Logic.Scout
+namespace Blokus.Logic.Heuristics
 {
-    class ScoutHeuristics : Heuristics
+    class EpicHeuristics : HeuristicsBase
     {
-        private bool nonDeterministic = false;
-        private static Random _Random = new Random();
-
-        int[] indices;
-        public ScoutHeuristics()
+        private int[] indices;
+        public EpicHeuristics()
         {
             CreateOrder();
         }
@@ -26,33 +23,19 @@ namespace Blokus.Logic.Scout
             }
         }
 
-        public ScoutHeuristics(bool nonDeterministic)
-        {
-            CreateOrder();
-            this.nonDeterministic = nonDeterministic;
-        }
-
-        /// <summary>
-        /// dla pomaranczowego gracza promuje ruchy w kierunku lewego gornego rogu planszy
-        /// dla fioletowego gracza promuje ruchy w kierunku prawego dolnego rogu planszy
-        /// </summary>
         public override double GetBoardEvaluation(GameState gameState)
         {
             double add = 0.0;
-            if (nonDeterministic)
+            if (IsNonDeterministic)
             {
                 add = _Random.NextDouble();
                 add *= add;
                 add *= add;
             }
-            return GameRules.GetMoves(gameState).Count * (1 + add) * 0.01;
+            return GameRules.GetMoves(gameState).Count * (1 + add) * 0.001;
         }
 
 
-        /// <summary>
-        /// na poczatku listy klockow ustawia klocki o najwiekszej liczbie rogow lub najwiekszej liczbie elementow
-        /// </summary>
-        /// <param name="gameState"></param>
         public override void SortHand(GameState gameState)
         {
             gameState.CurrentPlayerHand.HandPieces.Sort((x, y) =>
@@ -61,12 +44,7 @@ namespace Blokus.Logic.Scout
             });
         }
 
-        /// <summary>
-        /// dla pomaranczowego gracza promuje ruchy w kierunku lewego gornego rogu planszy
-        /// dla fioletowego gracza promuje ruchy w kierunku prawego dolnego rogu planszy
-        /// </summary>
-        /// <param name="gameState"></param>
-        /// <param name="moves"></param>
+
         public override void SortMoves(GameState gameState, List<Move> moves)
         {
             int phase = 1;
@@ -78,18 +56,12 @@ namespace Blokus.Logic.Scout
             {
                 phase = 3;
             }
-            if (gameState.AllMoves.Count >= 24)
-            {
-                phase = 4;
-            } 
             switch(phase)
             {
                 case 1: Phase1(gameState, moves); break;
                 case 2: Phase2(gameState, moves); break;
                 case 3: Phase3(gameState, moves); break;
-               // case 4: Phase4(gameState, moves); break;
             }
-
         }
 
         private static void Phase1(GameState gameState, List<Move> moves)
@@ -135,6 +107,11 @@ namespace Blokus.Logic.Scout
                 }
                 return y.PieceVariant.Squares.Length.CompareTo(x.PieceVariant.Squares.Length);
             });
+        }
+
+        public override string ToString()
+        {
+            return "Epic";
         }
     }
 }

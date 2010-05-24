@@ -14,7 +14,6 @@ using System.Windows.Shapes;
 using Blokus.ViewModel;
 using Blokus.Misc;
 using Blokus.Logic;
-using Blokus.Logic.MonteCarloTreeSearch;
 using Blokus.Logic.MCTS;
 using Blokus.Logic.MCTS2v2;
 
@@ -31,8 +30,7 @@ namespace Blokus.UI
         {
             this.DataContext = new GameCoordinator();
             InitializeComponent();
-      //      MultipleTree.ReadTree(MonteCarloTreeSearchPlayer.filename);// = new MultipleTree();
-            //MonteCarloTreeSearchPlayer.tree.ReadTree(MonteCarloTreeSearchPlayer.filename);
+ 
             MCSTPlayer.ReadTree(filename2);
             MCTS2v2Player.ReadTree(filename);
         }
@@ -80,7 +78,11 @@ namespace Blokus.UI
         private void ComboBox_Loaded_1(object sender, RoutedEventArgs e)
         {
             ((ComboBox)sender).SelectedIndex = 2;
-            ((Blokus.Logic.Scout.ScoutPlayer)((ComboBox)sender).SelectedValue)._Heursitics = new Blokus.Logic.AlphaBeta.AlphaBetaHeuristics(true);
+        }
+
+        private void heuristicsComboBox_Loaded(object sender, RoutedEventArgs e)
+        {
+            ((ComboBox)sender).SelectedIndex = 1;
         }
     }
 }

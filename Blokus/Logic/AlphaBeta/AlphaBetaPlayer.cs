@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Blokus.Logic.Heuristics;
 
 namespace Blokus.Logic.AlphaBeta
 {
@@ -22,8 +23,14 @@ namespace Blokus.Logic.AlphaBeta
             (* Initial call *)
             alphabeta(origin, depth, -infinity, +infinity)
          */
-        private int _MaxDepth = 1;
-        private int _MaxTreeRank = 1;
+        private int _MaxDepth = 2;
+        private int _MaxTreeRank = 5;
+
+        public override HeuristicsBase Heuristics
+        {
+            get { return _Heursitics; }
+            set { _Heursitics = value; }
+        }
 
         public int MaxDepth
         {
@@ -39,7 +46,7 @@ namespace Blokus.Logic.AlphaBeta
 
 
         private Move _LastMove;
-        private AlphaBetaHeuristics _Heursitics = new AlphaBetaHeuristics(true);
+        private HeuristicsBase _Heursitics;
 
         public override Move GetMove(GameState gameState)
         {

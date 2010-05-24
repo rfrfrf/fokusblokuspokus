@@ -99,23 +99,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Logic\AIPlayer.cs" />
-    <Compile Include="Logic\AlphaBeta\AlphaBetaHeuristics.cs" />
+    <Compile Include="Logic\Heuristics\NaiveHeuristics.cs" />
     <Compile Include="Logic\AlphaBeta\AlphaBetaPlayer.cs" />
     <Compile Include="Logic\Board.cs" />
-    <Compile Include="Logic\Heuristics.cs" />
+    <Compile Include="Logic\Heuristics\HeuristicsBase.cs" />
     <Compile Include="Logic\MCTS2v2\GameStateExtender.cs" />
     <Compile Include="Logic\MCTS2v2\MCTS2v2Player.cs" />
     <Compile Include="Logic\MCTS2v2\Node.cs" />
-    <Compile Include="Logic\MCTS\MCSTHeuristics.cs" />
     <Compile Include="Logic\MCTS\MCSTPlayer.cs" />
-    <Compile Include="Logic\MonteCarloTreeSearch\MonteCarloTreeSearchPlayer.cs" />
-    <Compile Include="Logic\MonteCarloTreeSearch\MultipleTree.cs" />
-    <Compile Include="Logic\MonteCarloTreeSearch\MultipleTreeNode.cs" />
     <Compile Include="Logic\PiecePosition.cs" />
     <Compile Include="Logic\Pieces.cs" />
     <Compile Include="Logic\PieceVariant.cs" />
     <Compile Include="Logic\RandomPlayer\RandomPlayer.cs" />
-    <Compile Include="Logic\Scout\ScoutHeuristics.cs" />
+    <Compile Include="Logic\Heuristics\EpicHeuristics.cs" />
     <Compile Include="Logic\Scout\ScoutPlayer.cs" />
     <Compile Include="Misc\BoardClickEventArgs.cs" />
     <Compile Include="Misc\HandClickEventArgs.cs" />

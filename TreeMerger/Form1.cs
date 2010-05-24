@@ -6,7 +6,6 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using Blokus.Logic.MonteCarloTreeSearch;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using Blokus.Logic.MCTS;

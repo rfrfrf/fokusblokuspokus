@@ -6,13 +6,14 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows;
 using Blokus.Logic.Scout;
+using Blokus.Logic.Heuristics;
 
 namespace Blokus.Logic.MCTS2v2
 {
     [Serializable]
     public class MCTS2v2Player : AIPlayer
     {
-        Heuristics heuristics = new Scout.ScoutHeuristics(true);
+        HeuristicsBase heuristics;
         private static Node _Root;
         //private Player me;
         private Random _Random = new Random();
@@ -30,7 +31,15 @@ namespace Blokus.Logic.MCTS2v2
         private int movesWhenOpponentBlocked;
 
 
-
+        public override HeuristicsBase Heuristics
+        {
+            get { return heuristics; }
+            set 
+            { 
+                heuristics = value;
+                simulationStrategy.Heuristics = value;
+            }
+        }
 
         public int MaxDepth
         {

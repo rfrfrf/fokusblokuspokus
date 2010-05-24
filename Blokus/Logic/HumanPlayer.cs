@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Blokus.Logic.Heuristics;
 
 namespace Blokus.Logic
 {
@@ -13,6 +14,8 @@ namespace Blokus.Logic
         private Move _LastMove;
 
         #region PlayerBase Members
+
+        public override HeuristicsBase Heuristics { get; set; }
 
         public override Move GetMove(GameState gameState)
         {

@@ -10,6 +10,7 @@ using Blokus.UI;
 using System.Windows;
 using Blokus.Logic.MCTS;
 using Blokus.Logic.Scout;
+using Blokus.Logic.Heuristics;
 
 namespace Blokus.ViewModel
 {
@@ -26,7 +27,8 @@ namespace Blokus.ViewModel
         private int _playedGames = 0;
         private double _orangeWins = 0.0;
         private bool _playersSwaped = false;
-
+        private bool _trainingInProgress = false;
+        private bool _gameInProgress = false;
         #region Properties
 
         public bool SwapPlayers {get; set; }
@@ -114,16 +116,44 @@ namespace Blokus.ViewModel
             }
         }
 
+        public HeuristicsBase OrangeHeuristics
+        {
+            get { return _OrangePlayer.Heuristics; }
+            set { _OrangePlayer.Heuristics = value; NotifyPropertyChanged("OrangeHeuristics"); }
+        }
+
+        public HeuristicsBase VioletHeuristics
+        {
+            get { return _VioletPlayer.Heuristics; }
+            set { _VioletPlayer.Heuristics = value; NotifyPropertyChanged("VioletHeuristics"); }
+        }
+
         public PlayerBase OrangePlayer
         {
             get { return _OrangePlayer; }
-            set { _OrangePlayer = value; NotifyPropertyChanged("OrangePlayer"); }
+            set 
+            {
+                if (_OrangePlayer != null)
+                {
+                    value.Heuristics = _OrangePlayer.Heuristics;
+                }
+                _OrangePlayer = value; 
+                NotifyPropertyChanged("OrangePlayer"); 
+            }
         }
 
         public PlayerBase VioletPlayer
         {
             get { return _VioletPlayer; }
-            set { _VioletPlayer = value; NotifyPropertyChanged("VioletPlayer"); }
+            set 
+            {
+                if (_VioletPlayer != null)
+                {
+                    value.Heuristics = _VioletPlayer.Heuristics;
+                }
+                _VioletPlayer = value;
+                NotifyPropertyChanged("VioletPlayer"); 
+            }
         }
 
         public Hand OrangeHand { get; set; }
@@ -152,10 +182,10 @@ namespace Blokus.ViewModel
         public GameCoordinator()
         {
             NewGameCommand = new RelayCommand((arg) => NewGame(),
-                delegate(object arg) { return OrangePlayer != null && VioletPlayer != null; });
+                delegate(object arg) { return OrangePlayer != null && VioletPlayer != null && !_trainingInProgress; });
 
             TrainCommand = new RelayCommand((arg) => NewTraining(),
-                delegate(object arg) { return OrangePlayer != null && VioletPlayer != null; });   
+                delegate(object arg) { return OrangePlayer != null && VioletPlayer != null && !_gameInProgress; });   
         }
 
         public void OnHandControlClick(HandControl handControl, Piece piece)
@@ -323,6 +353,7 @@ namespace Blokus.ViewModel
             var violet = VioletPlayer;
             _playersSwaped = false;
 
+            _trainingInProgress = true;
             while (!_Worker.CancellationPending)
             {
                 if (MakeMove(false))
@@ -358,10 +389,13 @@ namespace Blokus.ViewModel
                     NotifyPropertyChanged("OrangePercentageWins");
                 }
             }
+            _trainingInProgress = false;
+            NotifyPropertyChanged("TrainCommand");
         }
 
         private void GameWorker(object sender, DoWorkEventArgs e)
         {
+            _gameInProgress = true;
             while (!_Worker.CancellationPending)
             {
                 if (MakeMove(true))
@@ -369,6 +403,8 @@ namespace Blokus.ViewModel
                     break;
                 }
             }
+            _gameInProgress = false;
+            NotifyPropertyChanged("NewGameCommand");
         }
 
 
