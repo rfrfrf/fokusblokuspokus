@@ -129,6 +129,9 @@ namespace Blokus.Logic.MCTS2v2
             for (int i = prevNodes.Count - 1; i > 0; i--)//od --przed--ostatniego gdyż ostatni został zaktualizowany przed wywołaniem tej funkcji
             {
                 node = prevNodes.ElementAt(i);
+
+                bool rev = false;
+                R = ReverseOrNotR(R, i, out rev);//nie odwracamy wtw gdy przeciwnik jest zablokowany
                 //teraz aktualizacja!!!
                 node.computeAverage(R);
 
@@ -152,8 +155,7 @@ namespace Blokus.Logic.MCTS2v2
 
 
 
-                bool rev = false;
-                R = ReverseOrNotR(R, i, out rev);//nie odwracamy wtw gdy przeciwnik jest zablokowany
+                
                 
             }
         }
