@@ -74,10 +74,11 @@ namespace Blokus.Logic.Scout
 
         private static void Phase1(GameState gameState, List<Move> moves)
         {
+            int halfsize = Board.BoardSize / 2 - 1;
             moves.Sort((x, y) =>
             {
-                int a = Math.Abs(9 - x.Position.X) + Math.Abs(9 - x.Position.Y);
-                int b = Math.Abs(9 - y.Position.X) + Math.Abs(9 - y.Position.Y);
+                int a = Math.Abs(halfsize - x.Position.X) + Math.Abs(halfsize - x.Position.Y);
+                int b = Math.Abs(halfsize - y.Position.X) + Math.Abs(halfsize - y.Position.Y);
                 if (a != b)
                 {
                     return b.CompareTo(a);
@@ -106,8 +107,8 @@ namespace Blokus.Logic.Scout
         {
             moves.Sort((x, y) =>
             {
-                int a = Math.Abs(20 - x.Position.X + x.Position.Y);
-                int b = Math.Abs(20 - y.Position.X + y.Position.Y);
+                int a = Math.Abs(Board.BoardSize - 2 - x.Position.X - x.Position.Y);
+                int b = Math.Abs(Board.BoardSize - 2 - y.Position.X - y.Position.Y);
                 if (a != b)
                 {
                     return b.CompareTo(a);
