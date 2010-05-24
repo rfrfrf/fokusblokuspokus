@@ -29,6 +29,23 @@ namespace Blokus.Logic.MCTS2v2
         List<Node> prevNodes;
         private int movesWhenOpponentBlocked;
 
+
+
+
+        public int MaxDepth
+        {
+            get { return simulationStrategy.MaxDepth; }
+            set { simulationStrategy.MaxDepth = value; }
+        }
+
+        public int MaxTreeRank
+        {
+            get { return simulationStrategy.MaxTreeRank; }
+            set { simulationStrategy.MaxTreeRank = value; }
+        }
+
+
+
         public override void OnGameStart(GameState gameState)
         {
             //me = gameState.OrangePlayer is MCTS2v2Player ? (gameState.VioletPlayer is MCTS2v2Player ? Player.None : Player.Orange) : Player.Violet;
