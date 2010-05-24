@@ -398,7 +398,7 @@ namespace Blokus.Logic.MCTS2v2
                 if (moves == null)
                 {
                     heuristics.SortHand(gs);
-                    moves = GameRules.GetMoves(gs, MaxTreeRank);
+                    moves = GameRules.GetMoves(gs);
                     heuristics.SortMoves(gs, moves);
                 }
                 if (toLook.Children != null && toLook.Children.Count == moves.Count)
