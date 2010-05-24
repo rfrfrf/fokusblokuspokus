@@ -78,7 +78,7 @@ namespace Blokus.Logic.MCTS
         private Node _CurrentNode;
         private Player _MyColor;
         private Move _LastMove;
-        private Heuristics _Heursitics = new ScoutHeuristics();
+        private Heuristics _Heursitics = new ScoutHeuristics(true);
      //   private bool _Training = false;
 
         public MCSTPlayer()

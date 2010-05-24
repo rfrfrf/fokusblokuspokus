@@ -7,9 +7,16 @@ namespace Blokus.Logic.Scout
 {
     class ScoutHeuristics : Heuristics
     {
+        private bool nonDeterministic = false;
+        private static Random _Random = new Random();
 
         int[] indices;
         public ScoutHeuristics()
+        {
+            CreateOrder();
+        }
+
+        private void CreateOrder()
         {
             int[] order = new int[] { 19, 15, 16, 12, 18, 21, 11, 17, 20, 13, 14, 10, 8, 5, 6, 3, 9, 7, 4, 2, 1 };
             indices = new int[order.Length];
@@ -19,13 +26,26 @@ namespace Blokus.Logic.Scout
             }
         }
 
+        public ScoutHeuristics(bool nonDeterministic)
+        {
+            CreateOrder();
+            this.nonDeterministic = nonDeterministic;
+        }
+
         /// <summary>
         /// dla pomaranczowego gracza promuje ruchy w kierunku lewego gornego rogu planszy
         /// dla fioletowego gracza promuje ruchy w kierunku prawego dolnego rogu planszy
         /// </summary>
         public override double GetBoardEvaluation(GameState gameState)
         {
-            return GameRules.GetMoves(gameState).Count;
+            double add = 0.0;
+            if (nonDeterministic)
+            {
+                add = _Random.NextDouble();
+                add *= add;
+                add *= add;
+            }
+            return GameRules.GetMoves(gameState).Count * (1 + add) * 0.01;
         }
 
 

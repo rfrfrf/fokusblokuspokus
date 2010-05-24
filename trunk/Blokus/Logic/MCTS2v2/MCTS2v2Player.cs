@@ -12,7 +12,7 @@ namespace Blokus.Logic.MCTS2v2
     [Serializable]
     public class MCTS2v2Player : AIPlayer
     {
-        Heuristics heuristics = new Scout.ScoutHeuristics();
+        Heuristics heuristics = new Scout.ScoutHeuristics(true);
         private static Node _Root;
         //private Player me;
         private Random _Random = new Random();
@@ -397,7 +397,9 @@ namespace Blokus.Logic.MCTS2v2
             {
                 if (moves == null)
                 {
-                    moves = GameRules.GetMoves(gs);
+                    heuristics.SortHand(gs);
+                    moves = GameRules.GetMoves(gs, MaxTreeRank);
+                    heuristics.SortMoves(gs, moves);
                 }
                 if (toLook.Children != null && toLook.Children.Count == moves.Count)
                 {
