@@ -8,7 +8,7 @@ namespace Blokus.Logic.Scout
 {
     class ScoutPlayer : AIPlayer
     {
-        public Heuristics _Heursitics = new ScoutHeuristics();
+        public Heuristics _Heursitics = new ScoutHeuristics(true);
         private Move _LastMove;
         private int _MaxDepth = 1;
         private int _MaxTreeRank = 1;
