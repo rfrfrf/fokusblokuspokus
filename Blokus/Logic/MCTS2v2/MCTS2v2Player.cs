@@ -56,10 +56,11 @@ namespace Blokus.Logic.MCTS2v2
 
             if (gameState.AllMoves.Count != 0 && currentNode != null)
             {
-                if (currentNode.Children != null && currentNode.Children.ContainsKey(gameState.AllMoves[gameState.AllMoves.Count - 1].SerializedMove))
+                int serMove = gameState.AllMoves[gameState.AllMoves.Count - 1].SerializedMove;
+                if (currentNode.Children != null && currentNode.Children.ContainsKey(serMove))
                 {
                     currentNodeParent = currentNode;
-                    currentNode = currentNode.Children.First(e => e.Key == gameState.AllMoves[gameState.AllMoves.Count - 1].SerializedMove).Value;
+                    currentNode = currentNode.Children[serMove];
                     prevNodes.Add(currentNode);
                 }
                 else
@@ -69,7 +70,7 @@ namespace Blokus.Logic.MCTS2v2
                     {
                         currentNodeParent = currentNode;
                         Node pom = new Node();//currentNode);
-                        currentNode.AddChild(gameState.AllMoves[gameState.AllMoves.Count - 1].SerializedMove, pom);
+                        currentNode.AddChild(serMove, pom);
                         currentNode = pom;
                         prevNodes.Add(currentNode);
                     }
