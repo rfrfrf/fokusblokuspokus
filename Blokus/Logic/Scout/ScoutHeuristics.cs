@@ -50,15 +50,15 @@ namespace Blokus.Logic.Scout
         public override void SortMoves(GameState gameState, List<Move> moves)
         {
             int phase = 1;
-            if (gameState.AllMoves.Count > 8)
+            if (gameState.AllMoves.Count >= 8)
             {
                 phase = 2;
             }
-            if (gameState.AllMoves.Count > 12)
+            if (gameState.AllMoves.Count >= 12)
             {
                 phase = 3;
             }
-            if (gameState.AllMoves.Count > 24)
+            if (gameState.AllMoves.Count >= 24)
             {
                 phase = 4;
             } 
@@ -76,8 +76,8 @@ namespace Blokus.Logic.Scout
         {
             moves.Sort((x, y) =>
             {
-                int a = Math.Abs(10 - x.Position.X) + Math.Abs(10 - x.Position.Y);
-                int b = Math.Abs(10 - y.Position.X) + Math.Abs(10 - y.Position.Y);
+                int a = Math.Abs(9 - x.Position.X) + Math.Abs(9 - x.Position.Y);
+                int b = Math.Abs(9 - y.Position.X) + Math.Abs(9 - y.Position.Y);
                 if (a != b)
                 {
                     return b.CompareTo(a);
