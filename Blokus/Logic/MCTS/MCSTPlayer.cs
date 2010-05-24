@@ -8,6 +8,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using Blokus.Logic.MonteCarloTreeSearch;
 using System.Windows;
+using Blokus.Logic.Scout;
 
 namespace Blokus.Logic.MCTS
 {
@@ -72,12 +73,12 @@ namespace Blokus.Logic.MCTS
     {
         private static Node _Root;
 
-        private AlphaBetaPlayer _Playouter = new AlphaBetaPlayer();
+        private ScoutPlayer _Playouter = new ScoutPlayer();
         private Random _Random = new Random();
         private Node _CurrentNode;
         private Player _MyColor;
         private Move _LastMove;
-        private Heuristics _Heursitics = new MCSTHeuristics();
+        private Heuristics _Heursitics = new ScoutHeuristics();
      //   private bool _Training = false;
 
         public MCSTPlayer()
