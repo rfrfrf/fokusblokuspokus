@@ -152,6 +152,7 @@
             SelectedValue="{Binding OrangeHeuristics}" Loaded="heuristicsComboBox_Loaded" />
         <CheckBox 
             Grid.Row="3"
+            Foreground="Blue"
             VerticalAlignment="Center"
             HorizontalAlignment="Center"
             IsChecked="{Binding OrangeHeuristics.IsNonDeterministic}" 
@@ -208,6 +209,7 @@
             </Button>
             <CheckBox 
                 Grid.Column="2"
+                Foreground="Blue"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
                 IsChecked="{Binding SwapPlayers}" 
@@ -231,6 +233,7 @@
         <CheckBox 
             Grid.Row="3"
             Grid.Column="2"
+            Foreground="Blue"
             VerticalAlignment="Center"
             HorizontalAlignment="Center"
             IsChecked="{Binding VioletHeuristics.IsNonDeterministic}" 
