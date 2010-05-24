@@ -18,5 +18,10 @@ namespace Blokus.Logic.RandomPlayer
             }
             return moves[_Random.Next(moves.Count)];
         }
+
+        public override string ToString()
+        {
+            return "Random";
+        }
     }
 }
