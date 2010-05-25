@@ -28,6 +28,7 @@ namespace Blokus.Logic.MCTS2v2
         private int lastMovesCount = -1;
 
         List<Node> prevNodes;
+        //List<int> movesCountPerNode;//zawiera info o tym, ile bylo dozwolonych ruchow dla node w prevNodes
         private int movesWhenOpponentBlocked;
 
 
@@ -60,9 +61,10 @@ namespace Blokus.Logic.MCTS2v2
             //me = gameState.OrangePlayer is MCTS2v2Player ? (gameState.VioletPlayer is MCTS2v2Player ? Player.None : Player.Orange) : Player.Violet;
             currentNode = _Root;
             currentNodeParent = null;
-            simulationStrategy.MaxDepth = 1;
-            simulationStrategy.MaxTreeRank = 1;
+            //simulationStrategy.MaxDepth = 1;
+            //simulationStrategy.MaxTreeRank = 1;
             prevNodes = new List<Node>();
+            //movesCountPerNode = new List<int>();
             prevNodes.Add(currentNode);
             movesWhenOpponentBlocked = int.MaxValue;
             lastMovesCount = -1;
@@ -142,6 +144,12 @@ namespace Blokus.Logic.MCTS2v2
                 bool rev = false;
                 R = ReverseOrNotR(R, i, out rev);//nie odwracamy wtw gdy przeciwnik jest zablokowany
                 //teraz aktualizacja!!!
+
+                //nalezy sprawdzic czy nie propaguje sie int.MaxValue lub int.MinValue wtw gdy MCTSSolver moze zwrocic int.MaxValue lub int.MinValue
+                //if (R == int.MaxValue || R == int.MinValue)
+                //{
+
+                //}
                 node.computeAverage(R);
 
                 //if (R == int.MaxValue)
@@ -221,11 +229,11 @@ namespace Blokus.Logic.MCTS2v2
                 }
                 else if (p == 1)//ja wygralem
                 {
-                    return int.MaxValue;
+                    return 1;// int.MaxValue;
                 }
                 else //if(p== Player.Violet)//czyli ja przegralem
                 {
-                    return int.MinValue;
+                    return -1;// int.MinValue;
                 }
             }
             //gra trwa
