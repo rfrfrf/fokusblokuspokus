@@ -323,7 +323,7 @@ namespace Blokus.Logic.MCTS2v2
                     gameState.AddMove(new Move(move));
                     gameState.SwapCurrentPlayer();
 
-                    var result = heuristics.GetBoardEvaluation(gameState);
+                    var result = -heuristics.GetBoardEvaluation(gameState);
 
                     gameState.SwapCurrentPlayer();
                     gameState.DelMove(new Move(move));
@@ -355,7 +355,7 @@ namespace Blokus.Logic.MCTS2v2
         private int PlaySimulatedGame(GameState gstate)
         {
             GameState state = gstate.Clone();
-            Player player = state.CurrentPlayerColor;
+
             while (true)
             {
                 //var moves = GameRules.GetMoves(state);
@@ -371,7 +371,12 @@ namespace Blokus.Logic.MCTS2v2
                 state.AddMove(move);
                 state.SwapCurrentPlayer();
             }
-            return (int)GameRules.GetGameResult(state);
+            var result = (int)GameRules.GetGameResult(state);
+            if (state.CurrentPlayerColor != gstate.CurrentPlayerColor)
+            {
+                result *= -1;
+            }
+            return result;
         }
 
 
@@ -419,25 +424,18 @@ namespace Blokus.Logic.MCTS2v2
                     if (toLook.Children == null || !toLook.Children.ContainsKey(m.SerializedMove))//jeśli nie zawiera
                     {
                         Node nd = new Node();//toLook);
-                        currVal =  -mf(nd, m.SerializedMove, gs);// i tak zwraca zero
+                        currVal = mf(nd, m.SerializedMove, gs);// i tak zwraca zero
                         if (currVal > maxVal)
                         {
                             maxVal = currVal;
                             n = nd;
                             move = m.SerializedMove;
-                         //   break; //i tak nie znajdzie niczego większego
+                          //  break; //i tak nie znajdzie niczego większego
                         }
                     }
                 }
-            }
-
-            
+            }            
         }
-
-
-
-
-
 
 
         public static void SaveTree(string filename)
