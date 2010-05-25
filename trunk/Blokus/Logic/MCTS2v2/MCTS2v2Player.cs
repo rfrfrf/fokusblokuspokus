@@ -412,7 +412,7 @@ namespace Blokus.Logic.MCTS2v2
                 if (moves == null)
                 {
                     heuristics.SortHand(gs);
-                    moves = GameRules.GetMoves(gs,5);
+                    moves = GameRules.GetMoves(gs);
                     heuristics.SortMoves(gs, moves);
                 }
                 if (toLook.Children != null && toLook.Children.Count == moves.Count)
@@ -430,7 +430,7 @@ namespace Blokus.Logic.MCTS2v2
                             maxVal = currVal;
                             n = nd;
                             move = m.SerializedMove;
-                            break; //i tak nie znajdzie niczego większego
+                          //  break; //i tak nie znajdzie niczego większego
                         }
                     }
                 }
