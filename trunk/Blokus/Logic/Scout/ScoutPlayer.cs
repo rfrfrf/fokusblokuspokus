@@ -60,69 +60,72 @@ namespace Blokus.Logic.Scout
     return α
 
          * */
-        private double NegaScout (GameState gameState, double alpha, double beta, int d )
+        private double NegaScout(GameState gameState, double alpha, double beta, int d)
         {                     /* compute minimax value of position p */
-           double a, b, t;
+            double a, b, t;
 
-           if ( d >= MaxDepth )
-              return _Heursitics.GetBoardEvaluation(gameState);
+            if (d >= MaxDepth)
+                return _Heursitics.GetBoardEvaluation(gameState);
 
-           _Heursitics.SortHand(gameState); //posortuj klocki gracza by najlepsze byly na poczatku
-           var moves = GameRules.GetMoves(gameState, MaxTreeRank); //pobierz MaxTreeRank pierwszych dostepnych ruchow
+            _Heursitics.SortHand(gameState); //posortuj klocki gracza by najlepsze byly na poczatku
+            var moves = GameRules.GetMoves(gameState, Math.Max(GameRules.MinMovesCount, MaxTreeRank)); //pobierz MaxTreeRank pierwszych dostepnych ruchow
 
-           if (moves.Count == 0)
-           {
-               return GameRules.GetGameResult(gameState); // pozycja koncowa
-           }
+            if (moves.Count == 0)
+            {
+                return GameRules.GetGameResult(gameState); // pozycja koncowa
+            }
 
-           _Heursitics.SortMoves(gameState, moves); //posortuj ruchy by najlepsze byly na poczatku
+            _Heursitics.SortMoves(gameState, moves); //posortuj ruchy by najlepsze byly na poczatku
 
-           a = alpha;
-           b = beta;
-           bool first = true;
-           double maxVal = double.NegativeInfinity;
-           Move bestMove = null;
-           foreach(var move in moves)
-           {
-               //wczuj sie w przeciwnika
-              gameState.AddMove(move); //poloz na planszy klocek
-              gameState.SwapCurrentPlayer(); //zmien aktywnego gracza na przeciwnego
-               //znajdz ruch przeciwnka
-              t = -NegaScout(gameState, -b, -a, d + 1);
+            a = alpha;
+            b = beta;
+            bool first = true;
+            double maxVal = double.NegativeInfinity;
+            Move bestMove = null;
+            int i = 0;
+            foreach (var move in moves)
+            {
+                //wczuj sie w przeciwnika
+                gameState.AddMove(move); //poloz na planszy klocek
+                gameState.SwapCurrentPlayer(); //zmien aktywnego gracza na przeciwnego
+                //znajdz ruch przeciwnka
+                t = -NegaScout(gameState, -b, -a, d + 1);
 
-              if (t > maxVal)
-              {
-                  maxVal = t;
-                  bestMove = move;
-              }
-              
+                if (t > maxVal)
+                {
+                    maxVal = t;
+                    bestMove = move;
+                }
 
-              if ((t > a) && (t < beta) && !first && (d < MaxDepth - 1))
-              {
-                  a = -NegaScout(gameState, -beta, -t, d + 1);     /* re-search */
-                  if (a > maxVal)
-                  {
-                      maxVal = a;
-                      bestMove = move;
-                  }
-              }
-              first = false;
-              //przywroc najlepszy ruch
-              gameState.SwapCurrentPlayer(); //przywroc aktywnego gracza                 
-              gameState.DelMove(move); //zdejmij klocek z planszy
+                if ((t > a) && (t < beta) && !first && (d < MaxDepth - 1))
+                {
+                    a = -NegaScout(gameState, -beta, -t, d + 1);     /* re-search */
+                    if (a > maxVal)
+                    {
+                        maxVal = a;
+                        bestMove = move;
+                    }
+                }
+                first = false;
+                //przywroc najlepszy ruch
+                gameState.SwapCurrentPlayer(); //przywroc aktywnego gracza                 
+                gameState.DelMove(move); //zdejmij klocek z planszy
 
-              
-
-              a = Math.Max( a, t );
-              if (a >= beta)
-              {
-                  _LastMove = bestMove;
-                  return a;
-              }
-              b = a + 1;                      /* set new null window */
-           }
-           _LastMove = bestMove;
-           return a;
+                a = Math.Max(a, t);
+                if (a >= beta)
+                {
+                    _LastMove = bestMove;
+                    return a;
+                }
+                b = a + 1;                      /* set new null window */
+                i++;
+                if (i > MaxTreeRank)
+                {
+                    break;
+                }
+            }
+            _LastMove = bestMove;
+            return a;
         }
 
         public override string ToString()

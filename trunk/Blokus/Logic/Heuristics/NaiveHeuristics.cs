@@ -9,7 +9,7 @@ namespace Blokus.Logic.Heuristics
     {       
         public override double GetBoardEvaluation(GameState gameState)
         {
-            double add =0.0;
+            double add = 0.0;
             if (IsNonDeterministic)
             {
                 add = _Random.NextDouble();
@@ -17,7 +17,12 @@ namespace Blokus.Logic.Heuristics
                 add *= add;
             }
 
-            return GameRules.GetMoves(gameState).Count * 0.001 * (1 + add);
+            int result = GameRules.CountCurrentPlayerCorners(gameState); // dodaj dostepne narozniki gracza
+            gameState.SwapCurrentPlayer();
+            result -= GameRules.CountCurrentPlayerCorners(gameState); // i odejmij narozniki przeciwnika
+            gameState.SwapCurrentPlayer();
+
+            return result * (1.0 + add) * 0.001;
         }
 
         /// <summary>
@@ -41,6 +46,8 @@ namespace Blokus.Logic.Heuristics
                 Randomize(gameState.CurrentPlayerHand.HandPieces);
             }
         }
+
+
 
         public static void Randomize<T>(IList<T> list)
         {

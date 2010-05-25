@@ -8,6 +8,10 @@ namespace Blokus.Logic.Heuristics
     class EpicHeuristics : HeuristicsBase
     {
         private int[] indices;
+        private static HashSet<int> Phase1Set = new HashSet<int> { 12, 15, 16, 19 };
+        private static HashSet<int> Phase2Set = new HashSet<int> { 21, 18 };
+        private static HashSet<int> Phase3Set = new HashSet<int> { 20, 11, 17, 14, 10, 13 };
+
         public EpicHeuristics()
         {
             CreateOrder();
@@ -32,7 +36,8 @@ namespace Blokus.Logic.Heuristics
                 add *= add;
                 add *= add;
             }
-            return GameRules.GetMoves(gameState).Count * (1 + add) * 0.001;
+
+            return GameRules.GetMoves(gameState).Count * 0.001 * (1 + add);
         }
 
 
@@ -71,9 +76,18 @@ namespace Blokus.Logic.Heuristics
             {
                 int a = Math.Abs(halfsize - x.Position.X) + Math.Abs(halfsize - x.Position.Y);
                 int b = Math.Abs(halfsize - y.Position.X) + Math.Abs(halfsize - y.Position.Y);
+
+                if (!Phase1Set.Contains(x.Piece.Id))
+                {
+                    a += 1000;
+                }
+                if (!Phase1Set.Contains(y.Piece.Id))
+                {
+                    b += 1000;
+                }
                 if (a != b)
                 {
-                    return b.CompareTo(a);
+                    return a.CompareTo(b);
                 }
                 return y.PieceVariant.Squares.Length.CompareTo(x.PieceVariant.Squares.Length);
             });
@@ -87,6 +101,7 @@ namespace Blokus.Logic.Heuristics
             {
                 int a = x.Position.X + x.Position.Y;
                 int b = y.Position.X + y.Position.Y;
+
                 if (a != b)
                 {
                     return b.CompareTo(a) * multiplier;
@@ -101,9 +116,19 @@ namespace Blokus.Logic.Heuristics
             {
                 int a = Math.Abs(Board.BoardSize - 2 - x.Position.X - x.Position.Y);
                 int b = Math.Abs(Board.BoardSize - 2 - y.Position.X - y.Position.Y);
+
+                if (!Phase3Set.Contains(x.Piece.Id))
+                {
+                    a += 1000;
+                }
+                if (!Phase3Set.Contains(y.Piece.Id))
+                {
+                    b += 1000;
+                }
+
                 if (a != b)
                 {
-                    return b.CompareTo(a);
+                    return a.CompareTo(b);
                 }
                 return y.PieceVariant.Squares.Length.CompareTo(x.PieceVariant.Squares.Length);
             });

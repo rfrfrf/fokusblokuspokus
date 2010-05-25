@@ -62,7 +62,7 @@ namespace Blokus.Logic.AlphaBeta
                 return _Heursitics.GetBoardEvaluation(gameState);
             }
             _Heursitics.SortHand(gameState); //posortuj klocki gracza by najlepsze byly na poczatku
-            var moves = GameRules.GetMoves(gameState, MaxTreeRank); //pobierz MaxTreeRank pierwszych dostepnych ruchow
+            var moves = GameRules.GetMoves(gameState, Math.Max(GameRules.MinMovesCount, MaxTreeRank)); //pobierz MaxTreeRank pierwszych dostepnych ruchow
 
             if (moves.Count == 0)
             {
@@ -70,7 +70,7 @@ namespace Blokus.Logic.AlphaBeta
             }
 
             _Heursitics.SortMoves(gameState, moves); //posortuj ruchy by najlepsze byly na poczatku
-
+            int i = 0;
             foreach (var move in moves)
             {               
                 //wczuj sie w przeciwnika
@@ -90,6 +90,11 @@ namespace Blokus.Logic.AlphaBeta
                     _LastMove = move;
                 }
                 if (beta < alpha)
+                {
+                    break;
+                }
+                i++;
+                if (i > MaxTreeRank)
                 {
                     break;
                 }

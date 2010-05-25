@@ -390,7 +390,7 @@ namespace Blokus.ViewModel
                 }
             }
             _trainingInProgress = false;
-            NotifyPropertyChanged("TrainCommand");
+            NotifyPropertyChanged("OrangePercentageWins");
         }
 
         private void GameWorker(object sender, DoWorkEventArgs e)
@@ -404,7 +404,7 @@ namespace Blokus.ViewModel
                 }
             }
             _gameInProgress = false;
-            NotifyPropertyChanged("NewGameCommand");
+            NotifyPropertyChanged("OrangePercentageWins");
         }
 
 
