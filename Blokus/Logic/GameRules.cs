@@ -13,6 +13,8 @@ namespace Blokus.Logic
         public const int OrangeStartPositionX = 9;
         public const int OrangeStartPositionY = 9;
 
+        public const int MinMovesCount = 50;
+
         private const int EmptyHandBonus = 15;
         private const int MonominoLastBonus = 5;
 
@@ -21,19 +23,36 @@ namespace Blokus.Logic
             return GetMoves(gameState, int.MaxValue);
         }
 
+        public static int CountCurrentPlayerCorners(GameState gameState)
+        {
+            BoardCell[,] boardExt;
+            bool isGameNew;
+            List<PiecePosition> corners;
+            CreateCornersList(gameState, out boardExt, out isGameNew, out corners);
+            return corners.Count;
+        }
+
         public static List<Move> GetMoves(GameState gameState, int moveCount)
-        {           
-            var boardExt = CreateBoard(gameState);
-
-            bool isGameNew = SetStartPositions(gameState, boardExt);
-
-            FillCorners(gameState, boardExt);
-         
-            var corners = CreateBoardCornersList(boardExt);
+        {
+            BoardCell[,] boardExt;
+            bool isGameNew;
+            List<PiecePosition> corners;
+            CreateCornersList(gameState, out boardExt, out isGameNew, out corners);
 
             var result = GetMovesList(gameState, boardExt, corners, moveCount, isGameNew);
 
             return result;
+        }
+
+        private static void CreateCornersList(GameState gameState, out BoardCell[,] boardExt, out bool isGameNew, out List<PiecePosition> corners)
+        {
+            boardExt = CreateBoard(gameState);
+
+            isGameNew = SetStartPositions(gameState, boardExt);
+
+            FillCorners(gameState, boardExt);
+
+            corners = CreateBoardCornersList(boardExt);
         }
 
         private static bool SetStartPositions(GameState gameState, BoardCell[,] board)
