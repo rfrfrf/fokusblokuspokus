@@ -474,7 +474,7 @@ namespace Blokus.Logic.MCTS2v2
 
         public override string ToString()
         {
-            return "MCTS2v2";
+            return "MCTS2";
         }
 
 

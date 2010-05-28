@@ -30,7 +30,7 @@
             <logic:HumanPlayer />
             <logicAlphaBeta:AlphaBetaPlayer />
             <logicScout:ScoutPlayer />
-            <logicMcts:MCSTPlayer />
+            <!--<logicMcts:MCSTPlayer />-->
             <logicMcts2:MCTS2v2Player />
             <logicRandom:RandomPlayer />
         </x:Array>
@@ -38,7 +38,7 @@
             <logic:HumanPlayer />
             <logicAlphaBeta:AlphaBetaPlayer />
             <logicScout:ScoutPlayer />
-            <logicMcts:MCSTPlayer />
+            <!--<logicMcts:MCSTPlayer />-->
             <logicMcts2:MCTS2v2Player />
             <logicRandom:RandomPlayer />
         </x:Array>
