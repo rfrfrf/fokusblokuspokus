@@ -1,0 +1,1 @@
+Super wypasione ai do blokusa
